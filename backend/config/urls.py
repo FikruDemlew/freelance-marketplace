@@ -30,4 +30,9 @@ urlpatterns = [
         include("accounts.urls")
     ),
 
+    path(
+        "api/jobs/",
+        include("jobs.urls")
+    )
+
 ]
