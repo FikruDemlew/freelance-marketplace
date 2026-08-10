@@ -1,3 +1,55 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-# Create your models here.
+
+class Job(models.Model):
+
+    CATEGORY_CHOICES = [
+        ("Web Development", "Web Development"),
+        ("Mobile Development", "Mobile Development"),
+        ("UI/UX Design", "UI/UX Design"),
+        ("Graphics Design", "Graphics Design"),
+        ("Writing", "Writing"),
+        ("Data Science", "Data Science"),
+        ("Other", "Other"),
+    ]
+
+    STATUS_CHOICES = [
+        ("Open", "Open"),
+        ("Closed", "Closed"),
+    ]
+
+    client = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="jobs"
+    )
+
+    title = models.CharField(max_length=200)
+
+    description = models.TextField()
+
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES
+    )
+
+    budget = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    deadline = models.DateField()
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="Open"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.title
