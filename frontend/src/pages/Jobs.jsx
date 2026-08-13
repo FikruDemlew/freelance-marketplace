@@ -50,7 +50,9 @@ function Jobs() {
         <div>
 
             <h1>Available Jobs</h1>
-
+            <Link to="/jobs/create">
+                Post a Job
+            </Link>
             {jobs.map((job) => (
 
                 <div key={job.id}>

@@ -4,7 +4,7 @@ import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
+import CreateJob from "./pages/CreateJob";
 function App() {
     return (
         <Routes>
@@ -32,6 +32,11 @@ function App() {
             <Route
                 path="/register"
                 element={<Register />}
+            />
+
+            <Route
+                path="/jobs/create"
+                element={<CreateJob />}
             />
         </Routes>
     );
