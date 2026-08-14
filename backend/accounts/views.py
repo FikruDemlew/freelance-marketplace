@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.permissions import IsAuthenticated
 from .serializers import RegisterSerializer
 
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -74,3 +74,15 @@ class LoginAPIView(APIView):
             },
             status=status.HTTP_401_UNAUTHORIZED
         )
+        
+class MeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+    
+        profile = request.user.profile
+        return Response({
+            "id": request.user.id,
+            "username": request.user.username,
+            "email": request.user.email,
+            "role": profile.role,
+        })

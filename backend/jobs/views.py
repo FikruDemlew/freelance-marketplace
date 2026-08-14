@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions
+from rest_framework.exceptions import PermissionDenied
 
 from .models import Job
 from .serializers import JobSerializer
@@ -15,7 +16,15 @@ class JobListCreateAPIView(generics.ListCreateAPIView):
     ]
 
     def perform_create(self, serializer):
-        serializer.save(client=self.request.user)
+
+        if self.request.user.profile.role != "client":
+            raise PermissionDenied(
+                "Only clients can create jobs."
+            )
+
+        serializer.save(
+            client=self.request.user
+        )
 
 
 class JobDetailAPIView(generics.RetrieveUpdateDestroyAPIView):

@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import Login from "./pages/Login";
@@ -36,7 +36,11 @@ function App() {
 
             <Route
                 path="/jobs/create"
-                element={<CreateJob />}
+                element={
+                    <ProtectedRoute allowedRole="client">
+                        <CreateJob />
+                    </ProtectedRoute>
+                }
             />
         </Routes>
     );
