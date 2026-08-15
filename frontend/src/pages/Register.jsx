@@ -33,13 +33,11 @@ function Register() {
 
         try {
             await registerUser(formData);
-
             navigate("/login");
-
         } catch (error) {
             setError(
                 error.response?.data ||
-                "Registration failed."
+                    "Registration failed. Please try again."
             );
         } finally {
             setLoading(false);
@@ -47,103 +45,136 @@ function Register() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[url('/public/black5.jpg')] bg-center bg-cover">
-            <div className="flex flex-col items-center justify-center text-white p-8 bg-black/40 backdrop-blur-sm shadow-md w-full max-w-md rounded-2xl border border-white/20">
-                <h1>Create Account</h1>
+        <div className="min-h-screen grid lg:grid-cols-[1.1fr_1.4fr] bg-[#f5f7fb] text-slate-800">
+            <div
+                className="relative hidden lg:flex items-end justify-start overflow-hidden bg-cover bg-center"
+                style={{ backgroundImage: "url('/working.jpg')" }}
+            >
+                <div className="absolute inset-0 bg-slate-900/55" />
 
-                {error && (
-                    <p>{JSON.stringify(error)}</p>
-                )}
+                <div className="relative z-10 max-w-md p-10 text-white">
+                    <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm">
+                        ConnectFreelance
+                    </span>
 
-                <form onSubmit={handleSubmit}>
+                    <h1 className="mt-6 text-4xl font-bold leading-tight">
+                        Start your next opportunity.
+                    </h1>
 
-                    <div className="flex flex-col gap-2 my-4">
-                        <label>
-                            Username
-                        </label>
+                    <p className="mt-4 text-base text-slate-200">
+                        Join a thriving network of clients and freelancers building exceptional work together.
+                    </p>
 
-                        <input
-                            className=" border border-white/20 rounded-lg p-2"
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            required
-                        />
+                    <div className="mt-8 flex items-center gap-4 rounded-2xl border border-white/20 bg-white/5 p-4 backdrop-blur-sm">
+                        <div className="flex -space-x-2">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-cyan-500 text-sm font-semibold">C</span>
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-violet-500 text-sm font-semibold">F</span>
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-emerald-500 text-sm font-semibold">+ </span>
+                        </div>
+                        <p className="text-sm text-slate-100">
+                            Join <span className="font-semibold text-white">10k+</span> professionals already growing here
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex min-h-screen items-center justify-center p-6 sm:p-10">
+                <div className="w-full max-w-lg rounded-[28px] border border-slate-200 bg-white p-8 shadow-[0_25px_60px_rgba(15,23,42,0.12)] sm:p-10">
+                    <div className="mb-8">
+                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">Create account</p>
+                        <h2 className="mt-3 text-3xl font-bold text-slate-900">Join ConnectFreelance</h2>
+                        <p className="mt-2 text-sm text-slate-500">
+                            Create your profile and start connecting with the right opportunities today.
+                        </p>
                     </div>
 
-                    <div className="flex flex-col gap-2 my-4">
-                        <label>
-                            Email
-                        </label>
+                    {error && (
+                        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            {typeof error === "string" ? error : JSON.stringify(error)}
+                        </div>
+                    )}
 
-                        <input
-                            className=" border border-white/20 rounded-lg p-2"
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <div className="space-y-2">
+                            <label htmlFor="username" className="text-sm font-medium text-slate-700">
+                                Username
+                            </label>
+                            <input
+                                id="username"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100"
+                                type="text"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                placeholder="Choose a username"
+                                required
+                            />
+                        </div>
 
-                    <div className="flex flex-col gap-2 my-4">
-                        <label>
-                            Password
-                        </label>
+                        <div className="space-y-2">
+                            <label htmlFor="email" className="text-sm font-medium text-slate-700">
+                                Email address
+                            </label>
+                            <input
+                                id="email"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100"
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="Enter your email"
+                                required
+                            />
+                        </div>
 
-                        <input
-                            className=" border border-white/20 rounded-lg p-2"
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <label htmlFor="password" className="text-sm font-medium text-slate-700">
+                                Password
+                            </label>
+                            <input
+                                id="password"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100"
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="Create a password"
+                                required
+                            />
+                        </div>
 
-                    <div className="flex flex-row gap-2 my-4">
-                        <label>
-                            Account Type
-                        </label>
+                        <div className="space-y-2">
+                            <label htmlFor="role" className="text-sm font-medium text-slate-700">
+                                Account Type
+                            </label>
+                            <select
+                                id="role"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100"
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                            >
+                                <option value="client">Client</option>
+                                <option value="freelancer">Freelancer</option>
+                            </select>
+                        </div>
 
-                        <select
-                            className=" border border-white/20 rounded-lg p-2 "
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
+                        <button
+                            className="w-full rounded-full bg-cyan-800 px-4 py-3 text-base font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-70"
+                            type="submit"
+                            disabled={loading}
                         >
-                            <option className="bg-black/70 text-white hover:bg-red-300" value="client">
-                                Client
-                            </option>
+                            {loading ? "Creating account..." : "Register"}
+                        </button>
+                    </form>
 
-                            <option className="bg-gray-800 text-white" value="freelancer">
-                                Freelancer
-                            </option>
-                        </select>
-                    </div>
-
-                    <button
-                        className="bg-white hover:bg-white/30 text-black font-bold py-1 px-6 rounded"
-                        type="submit"
-                        disabled={loading}
-                    >
-                        {loading
-                            ? "Creating account..."
-                            : "Register"
-                        }
-                    </button>
-
-                </form>
-
-                <p className="mt-4 text-sm text-white/50">
-                    Already have an account?{" "}
-
-                    <Link className="text-white hover:text-white/70" to="/login">
-                        Login
-                    </Link>
-                </p>
-
+                    <p className="mt-8 text-center text-sm text-slate-600">
+                        Already have an account?{" "}
+                        <Link className="font-semibold text-cyan-700 hover:text-cyan-800" to="/login">
+                            Login
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );
