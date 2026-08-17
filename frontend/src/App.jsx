@@ -5,7 +5,7 @@ import JobDetails from "./pages/JobDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CreateJob from "./pages/CreateJob";
-import EditJobs from "./pages/EditJobs";
+import EditJob from "./pages/EditJob";
 
 function App() {
     return (
@@ -51,7 +51,7 @@ function App() {
                 path="/jobs/:id/edit"
                 element={
                     <ProtectedRoute allowedRole="client">
-                        <EditJobs />
+                        <EditJob />
                     </ProtectedRoute>
                }
             />

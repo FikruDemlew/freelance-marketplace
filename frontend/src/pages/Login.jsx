@@ -15,7 +15,7 @@ function Login() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const { fetchCurrentUser } = useAuth();
+    const { refreshUser } = useAuth();
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -38,11 +38,13 @@ function Login() {
             localStorage.setItem("access_token", data.access);
             localStorage.setItem("refresh_token", data.refresh);
 
-            await fetchCurrentUser();
+            await refreshUser();
             navigate("/jobs");
         } catch (error) {
+            console.error("Login error:", error);
             setError(
                 error.response?.data?.error ||
+                    error.message ||
                     "Login failed. Please check your credentials."
             );
         } finally {

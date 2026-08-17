@@ -14,39 +14,42 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
 
+    const refreshUser = async () => {
+
+        const token = localStorage.getItem("access_token");
+
+        if (!token) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+
+            const response = await api.get("/auth/me/");
+
+            setUser(response.data);
+
+        } catch (error) {
+
+            console.error("Failed to get current user:", error);
+
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+
+            setUser(null);
+
+        } finally {
+
+            setLoading(false);
+
+        }
+    };
+
+
     useEffect(() => {
-        const loadUser = async () => {
-
-            const token = localStorage.getItem("access_token");
-
-            if (!token) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-
-                const response = await api.get("/auth/me/");
-
-                setUser(response.data);
-
-            } catch (error) {
-
-                console.error("Failed to get current user:", error);
-
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refresh_token");
-
-                setUser(null);
-
-            } finally {
-
-                setLoading(false);
-
-            }
-        };
-
-        loadUser();
+        (async () => {
+            await refreshUser();
+        })();
     }, []);
 
 
@@ -65,6 +68,7 @@ export function AuthProvider({ children }) {
                 user,
                 loading,
                 logout,
+                refreshUser,
             }}
         >
             {children}

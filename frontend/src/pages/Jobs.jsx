@@ -84,7 +84,7 @@ function Jobs() {
                     <Link to={`/jobs/${job.id}`}>
                         View Details
                     </Link>
-                    <Link to={`/jobs/edit-jobs/${job.id}`}>
+                    <Link to={`/jobs/${job.id}/edit`}>
                     Edit Jobs
                     </Link>
                 </div>
