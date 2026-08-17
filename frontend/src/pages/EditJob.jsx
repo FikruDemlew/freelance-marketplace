@@ -5,7 +5,7 @@ import api from "../api/axios";
 import { useAuth } from "../context/useAuth";
 
 
-function EditJobs() {
+function EditJob() {
 
     const { id } = useParams();
     const navigate = useNavigate();
@@ -45,20 +45,22 @@ function EditJobs() {
                     `/jobs/${id}/`
                 );
 
+                console.log("Job fetched:", response.data);
+
                 const job = response.data;
 
                 setFormData({
                     title: job.title,
                     description: job.description,
                     category: job.category,
-                    budget: job.budget,
+                    budget: job.budget.toString(),
                     deadline: job.deadline,
                     status: job.status,
                 });
 
             } catch (error) {
 
-                console.error(error);
+                console.error("Fetch error:", error);
 
                 setError(
                     "Unable to load this job."
@@ -73,7 +75,7 @@ function EditJobs() {
 
         fetchJob();
 
-    }, [id, user, authLoading, navigate]);
+    }, [id, user, authLoading]);
 
 
     const handleChange = (event) => {
@@ -96,16 +98,25 @@ function EditJobs() {
 
         try {
 
-            await api.patch(
+            const payload = {
+                ...formData,
+                budget: parseFloat(formData.budget),
+            };
+
+            console.log("Sending payload:", payload);
+
+            const response = await api.patch(
                 `/jobs/${id}/`,
-                formData
+                payload
             );
+
+            console.log("Update response:", response.data);
 
             navigate(`/jobs/${id}`);
 
         } catch (error) {
 
-            console.error(error);
+            console.error("Update error:", error);
 
             if (error.response?.status === 403) {
 
@@ -116,7 +127,8 @@ function EditJobs() {
             } else {
 
                 setError(
-                    error.response?.data ||
+                    error.response?.data?.detail ||
+                    JSON.stringify(error.response?.data) ||
                     "Failed to update job."
                 );
             }
@@ -129,8 +141,16 @@ function EditJobs() {
     };
 
 
-    if (authLoading || loading) {
-        return <p>Loading...</p>;
+    if (authLoading) {
+        return <p>Loading auth...</p>;
+    }
+
+    if (loading) {
+        return <p>Loading job...</p>;
+    }
+
+    if (error && !formData.title) {
+        return <p>Error: {error}</p>;
     }
 
 
@@ -316,4 +336,4 @@ function EditJobs() {
 }
 
 
-export default EditJobs;
+export default EditJob;
