@@ -2,12 +2,22 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import RegisterSerializer
+from .serializers import (
+    RegisterSerializer,
+    LoginSerializer,
+)
+from drf_spectacular.utils import extend_schema
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 
 class RegisterAPIView(APIView):
+    
+    @extend_schema(
+        summary="Register a new user",
+        description="Create a new user account with a client or freelancer role.",
+        request=RegisterSerializer,
+    )
 
     def post(self, request):
 
@@ -35,6 +45,10 @@ class RegisterAPIView(APIView):
         
 class LoginAPIView(APIView):
 
+    @extend_schema(
+        request=LoginSerializer
+    )
+    
     def post(self, request):
 
         username = request.data.get(
