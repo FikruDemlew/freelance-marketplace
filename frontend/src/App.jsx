@@ -5,6 +5,7 @@ import JobDetails from "./pages/JobDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CreateJob from "./pages/CreateJob";
+import EditJob from "./pages/EditJob";
 function App() {
     return (
         <Routes>
@@ -41,6 +42,14 @@ function App() {
                         <CreateJob />
                     </ProtectedRoute>
                 }
+            />
+            <Route
+                path="/jobs/:id/edit"
+                element={
+                    <ProtectedRoute allowedRole="client">
+                        <EditJob />
+                    </ProtectedRoute>
+               }
             />
         </Routes>
     );
