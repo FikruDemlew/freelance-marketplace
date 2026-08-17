@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
 
 function JobDetails() {
 
     const { id } = useParams();
+    const { user } = useAuth();
 
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -22,6 +24,8 @@ function JobDetails() {
                 setJob(response.data);
 
             } catch (error) {
+
+                console.error(error);
 
                 setError("Failed to load job.");
 
@@ -76,6 +80,14 @@ function JobDetails() {
             <p>
                 Posted by: {job.client}
             </p>
+
+
+            {/* Show Edit button only to the job owner */}
+            {user && user.username === job.client && (
+                <Link to={`/jobs/${id}/edit`}>
+                    Edit Job
+                </Link>
+            )}
 
         </div>
     );

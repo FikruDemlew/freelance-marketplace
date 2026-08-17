@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import api from "../api/axios";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 
-function EditJob() {
+function EditJobs() {
 
     const { id } = useParams();
     const navigate = useNavigate();
@@ -37,44 +37,43 @@ function EditJob() {
             return;
         }
 
+        const fetchJob = async () => {
+
+            try {
+
+                const response = await api.get(
+                    `/jobs/${id}/`
+                );
+
+                const job = response.data;
+
+                setFormData({
+                    title: job.title,
+                    description: job.description,
+                    category: job.category,
+                    budget: job.budget,
+                    deadline: job.deadline,
+                    status: job.status,
+                });
+
+            } catch (error) {
+
+                console.error(error);
+
+                setError(
+                    "Unable to load this job."
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+        };
+
         fetchJob();
 
-    }, [id, user, authLoading]);
-
-
-    const fetchJob = async () => {
-
-        try {
-
-            const response = await api.get(
-                `/jobs/${id}/`
-            );
-
-            const job = response.data;
-
-            setFormData({
-                title: job.title,
-                description: job.description,
-                category: job.category,
-                budget: job.budget,
-                deadline: job.deadline,
-                status: job.status,
-            });
-
-        } catch (error) {
-
-            console.error(error);
-
-            setError(
-                "Unable to load this job."
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-    };
+    }, [id, user, authLoading, navigate]);
 
 
     const handleChange = (event) => {
@@ -317,4 +316,4 @@ function EditJob() {
 }
 
 
-export default EditJob;
+export default EditJobs;
