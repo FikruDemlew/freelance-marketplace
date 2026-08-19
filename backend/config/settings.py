@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'jobs',
     'proposals',
     'dashboard',
+    'applications',
     'core',
 ]
 

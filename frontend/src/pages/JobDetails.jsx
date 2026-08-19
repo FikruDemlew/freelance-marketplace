@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
+import ApplyModal from "../components/ApplyModal";
 
 function JobDetails() {
     const { id } = useParams();
@@ -12,6 +13,8 @@ function JobDetails() {
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [hasApplied, setHasApplied] = useState(false);
+    const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchJob = async () => {
@@ -309,14 +312,45 @@ function JobDetails() {
                                         Interested in this project?
                                         Submit a proposal to the client.
                                     </p>
+                                   
 
                                 </div>
 
                             )}
+                            {/* Render "Apply" button only if logged in user is a freelancer */}
+{user && user.role === 'freelancer' && (
+  <div className="mt-6">
+    <button
+      onClick={() => setIsApplyModalOpen(true)}
+      className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow transition"
+    >
+      Apply for this Job
+    </button>
+  </div>
+)}
+
+{/* Display success feedback banner after successful submission */}
+{hasApplied && (
+  <div className="mt-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm">
+    Your application was submitted successfully!
+  </div>
+)}
+
+{/* Render Modal Overlay */}
+{isApplyModalOpen && (
+  <ApplyModal
+    jobId={job.id}
+    jobTitle={job.title}
+    onClose={() => setIsApplyModalOpen(false)}
+    onSuccess={() => setHasApplied(true)}
+  />
+)}
 
                         </div>
+                        
 
                     </aside>
+                   
 
                 </div>
 
