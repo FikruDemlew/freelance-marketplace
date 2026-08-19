@@ -2,10 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, ProfileSerializer
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+
 
 class RegisterAPIView(APIView):
 
@@ -14,7 +15,6 @@ class RegisterAPIView(APIView):
         serializer = RegisterSerializer(
             data=request.data
         )
-
 
         if serializer.is_valid():
 
@@ -27,12 +27,12 @@ class RegisterAPIView(APIView):
                 status=status.HTTP_201_CREATED
             )
 
-
         return Response(
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
-        
+
+
 class LoginAPIView(APIView):
 
     def post(self, request):
@@ -45,19 +45,16 @@ class LoginAPIView(APIView):
             "password"
         )
 
-
         user = authenticate(
             username=username,
             password=password
         )
-
 
         if user:
 
             refresh = RefreshToken.for_user(
                 user
             )
-
 
             return Response({
 
@@ -67,22 +64,52 @@ class LoginAPIView(APIView):
 
             })
 
-
         return Response(
             {
                 "error": "Invalid credentials"
             },
             status=status.HTTP_401_UNAUTHORIZED
         )
-        
+
+
 class MeAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
-    
         profile = request.user.profile
+
         return Response({
             "id": request.user.id,
             "username": request.user.username,
             "email": request.user.email,
             "role": profile.role,
+            "bio": profile.bio,
+            "phone": profile.phone,
+            "profile_image": (
+                profile.profile_image.url
+                if profile.profile_image
+                else None
+            ),
         })
+
+    def patch(self, request):
+        profile = request.user.profile
+
+        serializer = ProfileSerializer(
+            profile,
+            data=request.data,
+            partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response({
+                "message": "Profile updated successfully",
+                "profile": serializer.data
+            })
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )

@@ -13,7 +13,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
-
     class Meta:
         model = User
 
@@ -23,7 +22,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             "password",
             "role"
         ]
-
 
     def create(self, validated_data):
 
@@ -35,11 +33,20 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data["password"]
         )
 
-
         Profile.objects.create(
             user=user,
             role=role
         )
 
-
         return user
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Profile
+        fields = [
+            "bio",
+            "phone",
+            "profile_image",
+        ]
