@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import HowItWorks from "../components/HowItWorks";
@@ -22,7 +22,7 @@ function Jobs() {
             try {
                 const response = await api.get("/jobs/");
                 setJobs(response.data);
-            } catch (error) {
+            } catch {
                 setError("Failed to load jobs.");
             } finally {
                 setLoading(false);
@@ -30,7 +30,6 @@ function Jobs() {
         };
 
         fetchJobs();
-        console.log("User in Jobs component:", user);
     }, []);
 
     if (loading) {

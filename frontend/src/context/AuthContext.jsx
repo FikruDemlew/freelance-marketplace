@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import api from "../api/axios";
 
@@ -6,13 +6,15 @@ import api from "../api/axios";
 const AuthContext = createContext();
 
 
+export { AuthContext };
+
 export function AuthProvider({ children }) {
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
 
-    const fetchCurrentUser = async () => {
+    const refreshUser = async () => {
 
         const token = localStorage.getItem("access_token");
 
@@ -45,7 +47,9 @@ export function AuthProvider({ children }) {
 
 
     useEffect(() => {
-        fetchCurrentUser();
+        (async () => {
+            await refreshUser();
+        })();
     }, []);
 
 
@@ -64,15 +68,10 @@ export function AuthProvider({ children }) {
                 user,
                 loading,
                 logout,
-                fetchCurrentUser,
+                refreshUser,
             }}
         >
             {children}
         </AuthContext.Provider>
     );
-}
-
-
-export function useAuth() {
-    return useContext(AuthContext);
 }

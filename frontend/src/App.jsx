@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
+
 function App() {
     return (
         <Routes>
@@ -43,6 +44,9 @@ function App() {
                     </ProtectedRoute>
                 }
             />
+
+
+
             <Route
                 path="/jobs/:id/edit"
                 element={
