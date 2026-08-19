@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import api from "../api/axios";
-import { useAuth } from "../context/useAuth";
-
+import Navbar from "../components/Navbar";
 
 function EditJob() {
-
     const { id } = useParams();
     const navigate = useNavigate();
-
-    const { user, loading: authLoading } = useAuth();
 
     const [formData, setFormData] = useState({
         title: "",
@@ -18,68 +14,41 @@ function EditJob() {
         category: "Web Development",
         budget: "",
         deadline: "",
-        status: "Open",
     });
 
+    const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
 
-
+    // Get existing job
     useEffect(() => {
-
-        if (authLoading) {
-            return;
-        }
-
-        if (!user) {
-            navigate("/login");
-            return;
-        }
-
         const fetchJob = async () => {
-
             try {
-
-                const response = await api.get(
-                    `/jobs/${id}/`
-                );
-
-                console.log("Job fetched:", response.data);
-
-                const job = response.data;
+                const response = await api.get(`/jobs/${id}/`);
 
                 setFormData({
-                    title: job.title,
-                    description: job.description,
-                    category: job.category,
-                    budget: job.budget.toString(),
-                    deadline: job.deadline,
-                    status: job.status,
+                    title: response.data.title || "",
+                    description: response.data.description || "",
+                    category: response.data.category || "Web Development",
+                    budget: response.data.budget || "",
+                    deadline: response.data.deadline || "",
                 });
-
             } catch (error) {
-
-                console.error("Fetch error:", error);
+                console.error(error);
 
                 setError(
-                    "Unable to load this job."
+                    error.response?.data ||
+                    "Failed to load job."
                 );
-
             } finally {
-
                 setLoading(false);
-
             }
         };
 
         fetchJob();
-
-    }, [id, user, authLoading]);
-
+    }, [id]);
 
     const handleChange = (event) => {
-
         const { name, value } = event.target;
 
         setFormData({
@@ -88,252 +57,343 @@ function EditJob() {
         });
     };
 
-
     const handleSubmit = async (event) => {
-
         event.preventDefault();
 
-        setSaving(true);
         setError("");
+        setSaving(true);
 
         try {
-
-            const payload = {
-                ...formData,
-                budget: parseFloat(formData.budget),
-            };
-
-            console.log("Sending payload:", payload);
-
-            const response = await api.patch(
+            await api.patch(
                 `/jobs/${id}/`,
-                payload
+                formData
             );
 
-            console.log("Update response:", response.data);
-
             navigate(`/jobs/${id}`);
-
         } catch (error) {
+            console.error(error);
 
-            console.error("Update error:", error);
-
-            if (error.response?.status === 403) {
-
-                setError(
-                    "You don't have permission to edit this job."
-                );
-
-            } else {
-
-                setError(
-                    error.response?.data?.detail ||
-                    JSON.stringify(error.response?.data) ||
-                    "Failed to update job."
-                );
-            }
-
+            setError(
+                error.response?.data ||
+                "Failed to update job."
+            );
         } finally {
-
             setSaving(false);
-
         }
     };
 
-
-    if (authLoading) {
-        return <p>Loading auth...</p>;
-    }
-
+    // Loading state
     if (loading) {
-        return <p>Loading job...</p>;
+        return (
+            <div className="min-h-screen bg-gray-50">
+                <Navbar />
+
+                <div className="mx-auto max-w-[1100px] px-6 py-20 text-center">
+
+                    <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-black" />
+
+                    <p className="mt-4 text-sm text-gray-500">
+                        Loading job...
+                    </p>
+
+                </div>
+            </div>
+        );
     }
 
+    // Error while loading
     if (error && !formData.title) {
-        return <p>Error: {error}</p>;
-    }
+        return (
+            <div className="min-h-screen bg-gray-50">
+                <Navbar />
 
+                <div className="mx-auto max-w-[900px] px-6 py-20">
+
+                    <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+
+                        <h2 className="text-xl font-bold text-red-900">
+                            Unable to load job
+                        </h2>
+
+                        <p className="mt-2 text-sm text-red-700">
+                            {typeof error === "string"
+                                ? error
+                                : JSON.stringify(error)}
+                        </p>
+
+                        <Link
+                            to="/jobs"
+                            className="mt-6 inline-flex rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+                        >
+                            Back to Jobs
+                        </Link>
+
+                    </div>
+
+                </div>
+            </div>
+        );
+    }
 
     return (
+        <div className="min-h-screen bg-gray-50">
 
-        <div>
+            {/* Navbar */}
+            <Navbar />
 
-            <h1>Edit Job</h1>
+            {/* Page Header */}
+            <section className="bg-black text-white">
 
-            {error && (
-                <p>
-                    {typeof error === "string"
-                        ? error
-                        : JSON.stringify(error)
-                    }
-                </p>
-            )}
+                <div className="mx-auto max-w-[1400px] px-6 py-14 lg:px-10">
 
+                    <Link
+                        to={`/jobs/${id}`}
+                        className="inline-flex items-center text-sm font-medium text-gray-400 transition hover:text-white"
+                    >
+                        ← Back to Job
+                    </Link>
 
-            <form onSubmit={handleSubmit}>
+                    <div className="mt-8 max-w-3xl">
 
-                <div>
+                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+                            Manage Project
+                        </p>
 
-                    <label>
-                        Job Title
-                    </label>
+                        <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+                            Edit your job
+                        </h1>
 
-                    <input
-                        type="text"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        required
-                    />
+                        <p className="mt-5 max-w-2xl text-base leading-7 text-gray-400 sm:text-lg">
+                            Update your project details and make sure
+                            freelancers have the information they need.
+                        </p>
 
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Description
-                    </label>
-
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        required
-                    />
+                    </div>
 
                 </div>
 
+            </section>
 
-                <div>
+            {/* Form */}
+            <main className="mx-auto max-w-[1100px] px-6 py-12 lg:px-10 lg:py-16">
 
-                    <label>
-                        Category
-                    </label>
+                <div className="rounded-[28px] border border-gray-200 bg-white p-6 shadow-sm sm:p-10">
 
-                    <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
+                    {/* Form heading */}
+                    <div className="mb-10 border-b border-gray-100 pb-8">
+
+                        <h2 className="text-2xl font-bold tracking-tight text-gray-950">
+                            Job information
+                        </h2>
+
+                        <p className="mt-2 text-sm text-gray-500">
+                            Make changes to your job information below.
+                        </p>
+
+                    </div>
+
+                    {/* Update error */}
+                    {error && (
+                        <div className="mb-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
+
+                            <p className="text-sm font-medium text-red-700">
+                                {typeof error === "string"
+                                    ? error
+                                    : JSON.stringify(error)}
+                            </p>
+
+                        </div>
+                    )}
+
+                    <form
+                        onSubmit={handleSubmit}
+                        className="space-y-8"
                     >
 
-                        <option value="Web Development">
-                            Web Development
-                        </option>
+                        {/* Job Title */}
+                        <div>
 
-                        <option value="Mobile Development">
-                            Mobile Development
-                        </option>
+                            <label
+                                htmlFor="title"
+                                className="mb-2 block text-sm font-semibold text-gray-900"
+                            >
+                                Job Title
+                            </label>
 
-                        <option value="UI/UX Design">
-                            UI/UX Design
-                        </option>
+                            <input
+                                id="title"
+                                type="text"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleChange}
+                                required
+                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                            />
 
-                        <option value="Graphics Design">
-                            Graphics Design
-                        </option>
+                        </div>
 
-                        <option value="Writing">
-                            Writing
-                        </option>
+                        {/* Description */}
+                        <div>
 
-                        <option value="Data Science">
-                            Data Science
-                        </option>
+                            <label
+                                htmlFor="description"
+                                className="mb-2 block text-sm font-semibold text-gray-900"
+                            >
+                                Project Description
+                            </label>
 
-                        <option value="Other">
-                            Other
-                        </option>
+                            <textarea
+                                id="description"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                required
+                                rows={7}
+                                className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm leading-6 text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                            />
 
-                    </select>
+                        </div>
+
+                        {/* Category */}
+                        <div>
+
+                            <label
+                                htmlFor="category"
+                                className="mb-2 block text-sm font-semibold text-gray-900"
+                            >
+                                Category
+                            </label>
+
+                            <select
+                                id="category"
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                            >
+
+                                <option value="Web Development">
+                                    Web Development
+                                </option>
+
+                                <option value="Mobile Development">
+                                    Mobile Development
+                                </option>
+
+                                <option value="UI/UX Design">
+                                    UI/UX Design
+                                </option>
+
+                                <option value="Graphics Design">
+                                    Graphics Design
+                                </option>
+
+                                <option value="Writing">
+                                    Writing
+                                </option>
+
+                                <option value="Data Science">
+                                    Data Science
+                                </option>
+
+                                <option value="Other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        {/* Budget + Deadline */}
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+
+                            {/* Budget */}
+                            <div>
+
+                                <label
+                                    htmlFor="budget"
+                                    className="mb-2 block text-sm font-semibold text-gray-900"
+                                >
+                                    Budget
+                                </label>
+
+                                <div className="relative">
+
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">
+                                        $
+                                    </span>
+
+                                    <input
+                                        id="budget"
+                                        type="number"
+                                        name="budget"
+                                        value={formData.budget}
+                                        onChange={handleChange}
+                                        min="0"
+                                        step="0.01"
+                                        required
+                                        className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-9 pr-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            {/* Deadline */}
+                            <div>
+
+                                <label
+                                    htmlFor="deadline"
+                                    className="mb-2 block text-sm font-semibold text-gray-900"
+                                >
+                                    Deadline
+                                </label>
+
+                                <input
+                                    id="deadline"
+                                    type="date"
+                                    name="deadline"
+                                    value={formData.deadline}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                />
+
+                            </div>
+
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-8 sm:flex-row sm:justify-end">
+
+                            <button
+                                type="button"
+                                onClick={() => navigate(`/jobs/${id}`)}
+                                className="rounded-xl border border-gray-200 px-6 py-3.5 text-sm font-semibold text-gray-700 transition hover:border-gray-400 hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                disabled={saving}
+                                className="rounded-xl bg-black px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {saving
+                                    ? "Updating..."
+                                    : "Save Changes"}
+                            </button>
+
+                        </div>
+
+                    </form>
 
                 </div>
 
-
-                <div>
-
-                    <label>
-                        Budget
-                    </label>
-
-                    <input
-                        type="number"
-                        name="budget"
-                        value={formData.budget}
-                        onChange={handleChange}
-                        min="0"
-                        step="0.01"
-                        required
-                    />
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Deadline
-                    </label>
-
-                    <input
-                        type="date"
-                        name="deadline"
-                        value={formData.deadline}
-                        onChange={handleChange}
-                        required
-                    />
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Status
-                    </label>
-
-                    <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleChange}
-                    >
-
-                        <option value="Open">
-                            Open
-                        </option>
-
-                        <option value="Closed">
-                            Closed
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    disabled={saving}
-                >
-                    {saving
-                        ? "Saving..."
-                        : "Save Changes"
-                    }
-                </button>
-
-
-                <button
-                    type="button"
-                    onClick={() => navigate(`/jobs/${id}`)}
-                >
-                    Cancel
-                </button>
-
-            </form>
+            </main>
 
         </div>
     );
 }
-
 
 export default EditJob;
