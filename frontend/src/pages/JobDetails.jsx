@@ -318,33 +318,33 @@ function JobDetails() {
 
                             )}
                             {/* Render "Apply" button only if logged in user is a freelancer */}
-{user && user.role === 'freelancer' && (
-  <div className="mt-6">
-    <button
-      onClick={() => setIsApplyModalOpen(true)}
-      className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow transition"
-    >
-      Apply for this Job
-    </button>
-  </div>
-)}
-
-{/* Display success feedback banner after successful submission */}
-{hasApplied && (
-  <div className="mt-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm">
-    Your application was submitted successfully!
-  </div>
-)}
-
-{/* Render Modal Overlay */}
-{isApplyModalOpen && (
-  <ApplyModal
-    jobId={job.id}
-    jobTitle={job.title}
-    onClose={() => setIsApplyModalOpen(false)}
-    onSuccess={() => setHasApplied(true)}
-  />
-)}
+                            {user && user.role === 'freelancer' && (
+                              <div className="mt-6">
+                                <button
+                                  onClick={() => setIsApplyModalOpen(true)}
+                                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md shadow transition"
+                                >
+                                  Apply for this Job
+                                </button>
+                              </div>
+                            )}
+                            
+                            {/* Display success feedback banner after successful submission */}
+                            {hasApplied && (
+                              <div className="mt-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm">
+                                Your application was submitted successfully!
+                              </div>
+                            )}
+                            
+                            {/* Render Modal Overlay */}
+                            {isApplyModalOpen && (
+                              <ApplyModal
+                                jobId={job.id}
+                                jobTitle={job.title}
+                                onClose={() => setIsApplyModalOpen(false)}
+                                onSuccess={() => setHasApplied(true)}
+                              />
+                            )}
 
                         </div>
                         
