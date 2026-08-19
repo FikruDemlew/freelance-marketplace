@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+@theme {
+--color-background: #121214;       /* Main dark background */
+  --color-surface: #1e1e24;          /* Card/Container background */
+  --color-surface-hover: #292932;    /* Slightly lighter surface for tags/inputs */
+
+  /* Brand & Accent Colors */
+  --color-primary: #00c058;          /* Vibrant green (Search button, View Job button) */
+  --color-primary-hover: #00a84d;    /* Darker shade for green button hover states */
+  --color-secondary: #8b5cf6;        /* Purple accent (Background circle behind person) */
+
+  /* Text Colors */
+  --color-text-main: #ffffff;        /* High-contrast white text */
+  --color-text-muted: #9ca3af;       /* Secondary grey text (labels, subtitles) */
+
+  /* Borders & Outlines */
+  --color-border: #2e2e38;           /* Card borders and input outlines */
+}
