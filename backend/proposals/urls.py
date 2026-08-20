@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     ProposalCreateAPIView,
     MyProposalsAPIView,
+    JobProposalsAPIView,
 )
 
 
@@ -16,4 +17,8 @@ urlpatterns = [
         "",
         MyProposalsAPIView.as_view()
     ),
+    path(
+    "job/<int:job_id>/",
+    JobProposalsAPIView.as_view()
+),
 ]
