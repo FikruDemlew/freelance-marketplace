@@ -4,6 +4,7 @@ from .views import (
     ProposalCreateAPIView,
     MyProposalsAPIView,
     JobProposalsAPIView,
+    ProposalStatusAPIView,
 )
 
 
@@ -20,5 +21,9 @@ urlpatterns = [
     path(
     "job/<int:job_id>/",
     JobProposalsAPIView.as_view()
+),
+    path(
+    "<int:proposal_id>/status/",
+    ProposalStatusAPIView.as_view()
 ),
 ]

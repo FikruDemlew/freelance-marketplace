@@ -98,3 +98,51 @@ class JobProposalsAPIView(APIView):
             serializer.data,
             status=status.HTTP_200_OK
         )    
+
+class ProposalStatusAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, proposal_id):
+
+        if not hasattr(request.user, "profile"):
+            return Response(
+                {"error": "User profile not found."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if request.user.profile.role != "client":
+            return Response(
+                {"error": "Only clients can update proposal status."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        try:
+            proposal = Proposal.objects.get(
+                id=proposal_id,
+                job__client=request.user
+            )
+        except Proposal.DoesNotExist:
+            return Response(
+                {"error": "Proposal not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        new_status = request.data.get("status")
+
+        if new_status not in ["Accepted", "Rejected"]:
+            return Response(
+                {
+                    "error": "Status must be either Accepted or Rejected."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        proposal.status = new_status
+        proposal.save()
+
+        serializer = ProposalSerializer(proposal)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )    
