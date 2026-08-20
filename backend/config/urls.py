@@ -46,6 +46,10 @@ urlpatterns = [
         "api/auth/",
         include("accounts.urls")
     ),
+    path(
+    "api/proposals/",
+    include("proposals.urls")
+    ),
 
     path(
         "api/jobs/",
