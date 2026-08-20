@@ -17,6 +17,7 @@ class ProposalCreateAPIView(APIView):
                 {"error": "User profile not found."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
         if request.user.profile.role != "freelancer":
             return Response(
                 {"error": "Only freelancers can submit proposals."},
@@ -39,6 +40,7 @@ class ProposalCreateAPIView(APIView):
         serializer = ProposalSerializer(
             data=request.data
         )
+
         if serializer.is_valid():
 
             serializer.save(
@@ -76,8 +78,6 @@ class MyProposalsAPIView(APIView):
         )
 
 
-
-
 class JobProposalsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -108,7 +108,8 @@ class JobProposalsAPIView(APIView):
         return Response(
             serializer.data,
             status=status.HTTP_200_OK
-        )    
+        )
+
 
 class ProposalStatusAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -148,6 +149,32 @@ class ProposalStatusAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        if new_status == "Accepted":
+
+            already_accepted = Proposal.objects.filter(
+                job=proposal.job,
+                status="Accepted"
+            ).exclude(
+                id=proposal.id
+            ).exists()
+
+            if already_accepted:
+                return Response(
+                    {
+                        "error": "This job already has an accepted proposal."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            Proposal.objects.filter(
+                job=proposal.job,
+                status="Pending"
+            ).exclude(
+                id=proposal.id
+            ).update(
+                status="Rejected"
+            )
+
         proposal.status = new_status
         proposal.save()
 
@@ -156,4 +183,4 @@ class ProposalStatusAPIView(APIView):
         return Response(
             serializer.data,
             status=status.HTTP_200_OK
-        )    
+        )
