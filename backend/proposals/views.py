@@ -17,17 +17,28 @@ class ProposalCreateAPIView(APIView):
                 {"error": "User profile not found."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         if request.user.profile.role != "freelancer":
             return Response(
                 {"error": "Only freelancers can submit proposals."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        job_id = request.data.get("job")
+
+        if Proposal.objects.filter(
+            job_id=job_id,
+            freelancer=request.user
+        ).exists():
+            return Response(
+                {
+                    "error": "You have already submitted a proposal for this job."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         serializer = ProposalSerializer(
             data=request.data
         )
-
         if serializer.is_valid():
 
             serializer.save(
