@@ -6,6 +6,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
+import Proposals from "./pages/Proposals";
+import MyProposals from "./pages/MyProposals";
+import SubmitProposal from "./pages/SubmitProposal";
 function App() {
     return (
         <Routes>
@@ -51,7 +54,32 @@ function App() {
                     </ProtectedRoute>
                }
             />
+            <Route
+    path="/jobs/:id/proposals"
+    element={
+        <ProtectedRoute allowedRole="client">
+            <Proposals />
+        </ProtectedRoute>
+    }
+/>
+            <Route
+    path="/my-proposals"
+    element={
+        <ProtectedRoute allowedRole="freelancer">
+            <MyProposals />
+        </ProtectedRoute>
+    }
+/>
+    <Route
+    path="/jobs/:id/proposal"
+    element={
+        <ProtectedRoute allowedRole="freelancer">
+            <SubmitProposal />
+        </ProtectedRoute>
+    }
+/>
         </Routes>
+            
     );
 }
 

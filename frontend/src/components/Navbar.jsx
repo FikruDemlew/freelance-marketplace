@@ -55,6 +55,14 @@ function Navbar() {
                             <span className="hidden text-sm font-medium text-gray-300 sm:block">
                                 {user.username}
                             </span>
+                            {user.role === "freelancer" && (
+    <Link
+        to="/my-proposals"
+        className="text-sm font-medium text-gray-300 transition hover:text-white"
+    >
+        My Proposals
+    </Link>
+)}
 
                             {user.role === "client" && (
                                 <Link

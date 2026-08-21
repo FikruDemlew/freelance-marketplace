@@ -13,6 +13,13 @@ function JobDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [showProposalForm, setShowProposalForm] = useState(false);
+    const [coverLetter, setCoverLetter] = useState("");
+    const [bidAmount, setBidAmount] = useState("");
+    const [proposalLoading, setProposalLoading] = useState(false);
+    const [proposalError, setProposalError] = useState(null);
+    const [proposalSuccess, setProposalSuccess] = useState(null);
+
     useEffect(() => {
         const fetchJob = async () => {
             try {
@@ -50,6 +57,38 @@ function JobDetails() {
             );
         }
     };
+    const handleSubmitProposal = async (e) => {
+    e.preventDefault();
+
+    setProposalLoading(true);
+    setProposalError(null);
+    setProposalSuccess(null);
+
+    try {
+        const response = await api.post("/proposals/create/", {
+            job: id,
+            cover_letter: coverLetter,
+            bid_amount: bidAmount,
+        });
+
+        console.log("Proposal submitted:", response.data);
+
+        setProposalSuccess("Proposal submitted successfully!");
+        setCoverLetter("");
+        setBidAmount("");
+        setShowProposalForm(false);
+
+    } catch (error) {
+        console.error(error);
+
+        setProposalError(
+            error.response?.data?.error ||
+            "Failed to submit proposal."
+        );
+    } finally {
+        setProposalLoading(false);
+    }
+};
 
     if (loading) {
         return (
@@ -275,6 +314,12 @@ function JobDetails() {
                             {isOwner ? (
 
                                 <div className="mt-7 space-y-3">
+                                    <Link
+    to={`/jobs/${id}/proposals`}
+    className="flex w-full items-center justify-center rounded-xl border border-gray-200 px-5 py-3.5 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+>
+    View Proposals
+</Link>
 
                                     <Link
                                         to={`/jobs/${id}/edit`}
@@ -296,23 +341,119 @@ function JobDetails() {
 
                             ) : (
 
-                                <div className="mt-7">
+    <div className="mt-7">
 
-                                    <button
-                                        type="button"
-                                        className="w-full rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800"
-                                    >
-                                        Submit a Proposal
-                                    </button>
+        {!showProposalForm ? (
 
-                                    <p className="mt-3 text-center text-xs leading-5 text-gray-400">
-                                        Interested in this project?
-                                        Submit a proposal to the client.
-                                    </p>
+            <>
+                <button
+                    type="button"
+                    onClick={() => {
+                        setShowProposalForm(true);
+                        setProposalError(null);
+                        setProposalSuccess(null);
+                    }}
+                    className="w-full rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                >
+                    Submit a Proposal
+                </button>
 
-                                </div>
+                <p className="mt-3 text-center text-xs leading-5 text-gray-400">
+                    Interested in this project?
+                    Submit a proposal to the client.
+                </p>
+            </>
 
-                            )}
+        ) : (
+
+            <form
+                onSubmit={handleSubmitProposal}
+                className="space-y-5"
+            >
+
+                <div>
+                    <label className="text-sm font-semibold text-gray-900">
+                        Cover Letter
+                    </label>
+
+                    <textarea
+                        value={coverLetter}
+                        onChange={(e) => setCoverLetter(e.target.value)}
+                        placeholder="Tell the client why you are a good fit for this project..."
+                        required
+                        rows={6}
+                        className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-black"
+                    />
+                </div>
+
+
+                <div>
+                    <label className="text-sm font-semibold text-gray-900">
+                        Your Bid
+                    </label>
+
+                    <div className="mt-2 flex items-center rounded-xl border border-gray-200">
+                        <span className="pl-4 text-gray-500">
+                            $
+                        </span>
+
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={bidAmount}
+                            onChange={(e) => setBidAmount(e.target.value)}
+                            placeholder="550.00"
+                            required
+                            className="w-full rounded-xl px-3 py-3 text-sm outline-none"
+                        />
+                    </div>
+                </div>
+
+
+                {proposalError && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                        {proposalError}
+                    </div>
+                )}
+
+
+                {proposalSuccess && (
+                    <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+                        {proposalSuccess}
+                    </div>
+                )}
+
+
+                <button
+                    type="submit"
+                    disabled={proposalLoading}
+                    className="w-full rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    {proposalLoading
+                        ? "Submitting..."
+                        : "Submit Proposal"}
+                </button>
+
+
+                <button
+                    type="button"
+                    onClick={() => {
+                        setShowProposalForm(false);
+                        setProposalError(null);
+                    }}
+                    className="w-full rounded-xl border border-gray-200 px-5 py-3.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                >
+                    Cancel
+                </button>
+
+            </form>
+
+        )}
+
+    </div>
+
+)}
 
                         </div>
 
