@@ -1,109 +1,162 @@
-import { useState, useEffect } from 'react';
-import { applyForJob, updateApplication } from '../services/applicationService';
+import { useEffect, useState } from "react";
+import {
+    createApplication,
+    updateApplication,
+} from "../services/application";
 
-export default function ApplyModal({ jobId, jobTitle, existingApplication, onClose, onSuccess }) {
-  const [proposal, setProposal] = useState('');
-  const [bidAmount, setBidAmount] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  // Pre-fill form if editing an existing application
-  useEffect(() => {
-    if (existingApplication) {
-      setProposal(existingApplication.proposal || '');
-      setBidAmount(existingApplication.bid_amount || '');
-    }
-  }, [existingApplication]);
+function ApplyModal({
+    jobId,
+    jobTitle,
+    existingApplication,
+    onClose,
+    onSuccess,
+}) {
+    const [proposal, setProposal] = useState("");
+    const [bidAmount, setBidAmount] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    useEffect(() => {
+        if (existingApplication) {
+            setProposal(existingApplication.proposal || "");
+            setBidAmount(existingApplication.bid_amount || "");
+        } else {
+            setProposal("");
+            setBidAmount("");
+        }
+    }, [existingApplication]);
 
-    try {
-      if (existingApplication) {
-        await updateApplication(existingApplication.id, proposal, bidAmount);
-      } else {
-        await applyForJob(jobId, proposal, bidAmount);
-      }
-      onSuccess();
-      onClose();
-    } catch (err) {
-      const serverMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.proposal?.[0] ||
-        err.response?.data?.bid_amount?.[0] ||
-        'Failed to save application.';
-      setError(serverMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-xl">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          {existingApplication ? 'Edit Application for:' : 'Apply for:'}{' '}
-          <span className="text-blue-600">{jobTitle}</span>
-        </h2>
+        setError("");
+        setLoading(true);
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
-            {error}
-          </div>
-        )}
+        try {
+            if (existingApplication) {
+                await updateApplication(
+                    existingApplication.id,
+                    {
+                        proposal,
+                        bid_amount: bidAmount,
+                    }
+                );
+            } else {
+                await createApplication({
+                    job: jobId,
+                    proposal,
+                    bid_amount: bidAmount,
+                });
+            }
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Your Bid Amount ($)
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              required
-              value={bidAmount}
-              onChange={(e) => setBidAmount(e.target.value)}
-              className="w-full border rounded-md px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+            await onSuccess();
+            onClose();
+        } catch (error) {
+            console.error(error);
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Proposal / Cover Letter
-            </label>
-            <textarea
-              required
-              rows={4}
-              value={proposal}
-              onChange={(e) => setProposal(e.target.value)}
-              className="w-full border rounded-md px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+            const data = error.response?.data;
 
-          <div className="flex justify-end space-x-3 pt-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition"
-            >
-              {loading
-                ? 'Saving...'
-                : existingApplication
-                ? 'Update Application'
-                : 'Submit Application'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+            if (data?.job?.[0]) {
+                setError(data.job[0]);
+            } else if (data?.proposal?.[0]) {
+                setError(data.proposal[0]);
+            } else if (data?.bid_amount?.[0]) {
+                setError(data.bid_amount[0]);
+            } else if (data?.detail) {
+                setError(data.detail);
+            } else {
+                setError("Failed to save application.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+                <h2 className="mb-6 text-xl font-bold text-gray-900">
+                    {existingApplication
+                        ? "Edit Application"
+                        : "Apply for Job"}
+                </h2>
+
+                <p className="mb-6 text-sm text-gray-500">
+                    {jobTitle}
+                </p>
+
+                {error && (
+                    <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                        {error}
+                    </div>
+                )}
+
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-5"
+                >
+                    <div>
+                        <label className="mb-2 block text-sm font-semibold text-gray-700">
+                            Bid Amount
+                        </label>
+
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            required
+                            value={bidAmount}
+                            onChange={(event) =>
+                                setBidAmount(event.target.value)
+                            }
+                            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-black"
+                            placeholder="Enter your bid"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="mb-2 block text-sm font-semibold text-gray-700">
+                            Proposal
+                        </label>
+
+                        <textarea
+                            required
+                            rows={6}
+                            value={proposal}
+                            onChange={(event) =>
+                                setProposal(event.target.value)
+                            }
+                            className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-black"
+                            placeholder="Write your proposal..."
+                        />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-2">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="rounded-xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {loading
+                                ? "Saving..."
+                                : existingApplication
+                                ? "Update Application"
+                                : "Submit Application"}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
 }
+
+export default ApplyModal;
