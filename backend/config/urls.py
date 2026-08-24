@@ -50,6 +50,10 @@ urlpatterns = [
     path(
         "api/jobs/",
         include("jobs.urls")
+    ),
+    path(
+        "api/applications/",
+        include("applications.urls")
     )
 
 ]

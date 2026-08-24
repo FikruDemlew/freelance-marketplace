@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Metamorphous&family=Revalia&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -15,5 +16,9 @@
   --color-text-muted: #9ca3af;       /* Secondary grey text (labels, subtitles) */
 
   /* Borders & Outlines */
-  --color-border: #2e2e38;           /* Card borders and input outlines */
+  --color-border: #2e2e38;     
+    
+   --font-audiowide: "Audiowide", sans-serif;
+  --font-metamorphous: "Metamorphous", serif;
+  --font-revalia: "Revalia", sans-serif;    /* Card borders and input outlines */
 }
