@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
+import Landing from "./pages/Landing";
 
 function App() {
     return (
@@ -13,7 +14,7 @@ function App() {
 
             <Route
                 path="/"
-                element={<Navigate to="/jobs" />}
+                element={<Landing />}
             />
 
             <Route

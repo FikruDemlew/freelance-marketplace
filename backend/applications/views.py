@@ -39,10 +39,10 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
 
 
 @extend_schema(
-    summary="Retrieve application details",
-    description="Fetch a specific application. Restricted to the applying freelancer and the job owner."
+    summary="Retrieve or update application details",
+    description="Fetch or edit a specific application. Only the applying freelancer can update proposal and bid amount."
 )
-class ApplicationDetailView(generics.RetrieveAPIView):
+class ApplicationDetailView(generics.RetrieveUpdateAPIView):  # Changed from RetrieveAPIView
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
     permission_classes = [permissions.IsAuthenticated, IsApplicationParticipant]

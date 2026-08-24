@@ -7,8 +7,10 @@ import Hero from "../components/Hero";
 import HowItWorks from "../components/HowItWorks";
 import CTA from "../components/CTA";
 import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
 
 function Jobs() {
+    const navigate = useNavigate()
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -24,6 +26,7 @@ function Jobs() {
                 setJobs(response.data);
             } catch {
                 setError("Failed to load jobs.");
+                navigate('/login')
             } finally {
                 setLoading(false);
             }
