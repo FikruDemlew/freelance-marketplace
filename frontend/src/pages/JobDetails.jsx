@@ -4,9 +4,7 @@ import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import ApplyModal from "../components/ApplyModal";
-import { getApplications } from "../services/applicationService";
-
-function JobDetails() {
+import { getApplications } from "../services/application";function JobDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -35,17 +33,31 @@ function JobDetails() {
     }, [id]);
 
     // 2. Fetch Application Status (Only runs AFTER job is loaded)
-    const fetchUserApplications = async () => {
-        if (user && user.role === "freelancer" && job) {
-            try {
-                const apps = await getApplications();
-                const match = apps.find((app) => app.job === job.id);
-                setExistingApplication(match || null);
-            } catch (err) {
-                console.error("Failed to check application status:", err);
-            }
-        }
-    };
+const fetchUserApplications = async () => {
+    if (!user || user.role !== "freelancer" || !job) {
+        setExistingApplication(null);
+        return;
+    }
+
+    try {
+        const applications = await getApplications();
+
+        const match = applications.find(
+            (application) =>
+                Number(application.job) === Number(job.id) &&
+                Number(application.freelancer_id) === Number(user.id)
+        );
+
+        setExistingApplication(match || null);
+    } catch (error) {
+        console.error(
+            "Failed to check application status:",
+            error
+        );
+
+        setExistingApplication(null);
+    }
+};
 
     // Trigger application check when the job data changes
     useEffect(() => {

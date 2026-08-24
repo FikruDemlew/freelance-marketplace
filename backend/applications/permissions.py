@@ -1,13 +1,14 @@
 from rest_framework import permissions
 
 
-class IsApplicationParticipant(permissions.BasePermission):
-    """
-    - View (GET): Freelancer who applied or Client who owns the job.
-    - Edit (PUT/PATCH): Only the freelancer who submitted the application.
-    """
+class IsApplicationOwnerOrReadOnly(permissions.BasePermission):
+
     def has_object_permission(self, request, view, obj):
+
+        # Anyone authenticated can view an application
         if request.method in permissions.SAFE_METHODS:
-            return obj.freelancer == request.user or obj.job.client == request.user
-        
+            return True
+
+        # Only the freelancer who submitted the application
+        # can modify or delete it
         return obj.freelancer == request.user
