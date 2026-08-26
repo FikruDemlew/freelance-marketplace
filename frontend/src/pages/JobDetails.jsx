@@ -4,7 +4,9 @@ import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import ApplyModal from "../components/ApplyModal";
-import { getApplications } from "../services/application";function JobDetails() {
+import { getApplications } from "../services/application";
+
+function JobDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -14,13 +16,20 @@ import { getApplications } from "../services/application";function JobDetails() 
     const [error, setError] = useState(null);
     const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
     const [existingApplication, setExistingApplication] = useState(null);
+    const [jobApplications, setJobApplications] = useState([]);
+    const [applicationsLoading, setApplicationsLoading] = useState(false);
+    
+
 
     // 1. Fetch Job Data
     useEffect(() => {
         const fetchJob = async () => {
             try {
                 const response = await api.get(`/jobs/${id}/`);
+                
                 setJob(response.data);
+
+
             } catch (error) {
                 console.error(error);
                 setError("Failed to load job.");
@@ -58,6 +67,41 @@ const fetchUserApplications = async () => {
         setExistingApplication(null);
     }
 };
+
+const fetchJobApplications = async () => {
+    if (!user || user.role !== "client" || !job) {
+        setJobApplications([]);
+        return;
+    }
+
+    setApplicationsLoading(true);
+
+    try {
+        const applications = await getApplications();
+
+        const applicationsForThisJob = applications.filter(
+            (application) =>
+                Number(application.job) === Number(job.id)
+        );
+
+        setJobApplications(applicationsForThisJob);
+    } catch (error) {
+        console.error(
+            "Failed to fetch job applications:",
+            error
+        );
+
+        setJobApplications([]);
+    } finally {
+        setApplicationsLoading(false);
+    }
+};
+
+useEffect(() => {
+    if (job && user?.role === "client") {
+        fetchJobApplications();
+    }
+}, [job, user]);
 
     // Trigger application check when the job data changes
     useEffect(() => {
@@ -286,6 +330,103 @@ const fetchUserApplications = async () => {
                         </div>
                     </aside>
                 </div>
+                {user &&
+                    user.role === "client" && (
+                   
+                        <section className="mt-10">
+                            <div className="mb-5">
+                                <h2 className="text-2xl font-bold text-gray-950">
+                                    Applications
+                                </h2>
+                    
+                                <p className="mt-1 text-sm text-gray-500">
+                                    Freelancers who applied to this job.
+                                </p>
+                            </div>
+                    
+                            {applicationsLoading ? (
+                                <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                                    <p className="text-sm text-gray-500">
+                                        Loading applications...
+                                    </p>
+                                </div>
+                            ) : jobApplications.length === 0 ? (
+                                <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                                    <p className="text-gray-600">
+                                        No applications yet.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-5">
+                                    {jobApplications.map((application) => (
+                                        <div
+                                            key={application.id}
+                                            className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+                                        >
+                                            <div className="flex flex-col justify-between gap-4 sm:flex-row">
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-gray-950">
+                                                        {application.freelancer}
+                                                    </h3>
+                                    
+                                                    <p className="mt-1 text-sm text-gray-500">
+                                                        Applied on{" "}
+                                                        {new Date(
+                                                            application.created_at
+                                                        ).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                                    
+                                                <span className="h-fit rounded-full bg-yellow-50 px-4 py-2 text-xs font-semibold text-yellow-700">
+                                                    {application.status}
+                                                </span>
+                                            </div>
+                                                    
+                                            <div className="mt-6 grid gap-6 border-t border-gray-100 pt-5 sm:grid-cols-2">
+                                                <div>
+                                                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                                                        Bid Amount
+                                                    </p>
+                                                    
+                                                    <p className="mt-2 text-xl font-bold text-gray-950">
+                                                        ${application.bid_amount}
+                                                    </p>
+                                                </div>
+                                                    
+                                                <div>
+                                                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                                                        Proposal
+                                                    </p>
+                                                    
+                                                    <p className="mt-2 text-sm leading-6 text-gray-600">
+                                                        {application.proposal}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                                    
+                            {application.status === "Pending" && (
+                                <div className="mt-6 flex gap-3 border-t border-gray-100 pt-5">
+                                    <button
+                                        type="button"
+                                        className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+                                    >
+                                        Accept
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="rounded-xl border border-red-200 px-5 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </section>
+    )}
             </main>
         </div>
     );

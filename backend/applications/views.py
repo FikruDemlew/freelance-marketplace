@@ -1,5 +1,6 @@
-from rest_framework import generics, permissions
+from rest_framework import generics
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Application
 from .serializers import ApplicationSerializer
@@ -10,16 +11,30 @@ class ApplicationListCreateAPIView(
     generics.ListCreateAPIView
 ):
 
-    queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
 
     permission_classes = [
-        permissions.IsAuthenticated
+        IsAuthenticated,
     ]
+
+    def get_queryset(self):
+
+        user = self.request.user
+
+        if user.profile.role == "freelancer":
+            return Application.objects.filter(
+                freelancer=user
+            )
+
+        if user.profile.role == "client":
+            return Application.objects.filter(
+                job__client=user
+            )
+
+        return Application.objects.none()
 
     def perform_create(self, serializer):
 
-        # Only freelancers can apply
         if self.request.user.profile.role != "freelancer":
             raise PermissionDenied(
                 "Only freelancers can apply for jobs."
@@ -38,5 +53,6 @@ class ApplicationDetailAPIView(
     serializer_class = ApplicationSerializer
 
     permission_classes = [
-        IsApplicationOwnerOrReadOnly
+        IsAuthenticated,
+        IsApplicationOwnerOrReadOnly,
     ]
