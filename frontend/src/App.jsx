@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
 import Landing from "./pages/Landing";
+import MyApplications from "./pages/MyApplications";
 
 function App() {
     return (
@@ -56,6 +57,16 @@ function App() {
                     </ProtectedRoute>
                }
             />
+            <Route
+                path="/my-applications"
+                element={
+                    <ProtectedRoute allowedRole="freelancer">
+                        <MyApplications />
+                    </ProtectedRoute>
+                }
+            />
+
+   =
         </Routes>
     );
 }
