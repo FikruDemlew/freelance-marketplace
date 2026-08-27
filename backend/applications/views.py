@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
 
 from .models import Application
 from .serializers import ApplicationSerializer
@@ -56,3 +57,15 @@ class ApplicationDetailAPIView(
         IsAuthenticated,
         IsApplicationOwnerOrReadOnly,
     ]
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        application = serializer.save()
+
+        if application.status == "Accepted":
+            Application.objects.filter(
+                job=application.job,
+                status="Pending",
+            ).exclude(
+                pk=application.pk,
+            ).update(status="Rejected")

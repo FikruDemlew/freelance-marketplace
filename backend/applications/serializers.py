@@ -37,7 +37,6 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "freelancer",
             "freelancer_id",
             "job_title",
-            "status",
             "created_at",
         ]
 
@@ -45,6 +44,17 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         request = self.context.get("request")
         job = attrs.get("job")
+        status = attrs.get("status")
+
+        if status and request and request.user.is_authenticated:
+            is_client = (
+                self.instance
+                and self.instance.job.client_id == request.user.id
+            )
+            if not is_client:
+                raise serializers.ValidationError(
+                    {"status": "Only the job owner can change application status."}
+                )
 
         if request and request.user.is_authenticated:
 

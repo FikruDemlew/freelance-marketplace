@@ -136,7 +136,13 @@ function MyApplications() {
                                         </p>
                                     </div>
 
-                                    <span className="h-fit rounded-full bg-yellow-50 px-4 py-2 text-xs font-semibold text-yellow-700">
+                                    <span className={`h-fit rounded-full px-4 py-2 text-xs font-semibold ${
+                                        application.status === "Accepted"
+                                            ? "bg-green-50 text-green-700"
+                                            : application.status === "Rejected"
+                                            ? "bg-red-50 text-red-700"
+                                            : "bg-yellow-50 text-yellow-700"
+                                    }`}>
                                         {application.status}
                                     </span>
                                 </div>

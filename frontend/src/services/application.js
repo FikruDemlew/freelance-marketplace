@@ -33,6 +33,11 @@ export const updateApplication = async (id, applicationData) => {
 };
 
 
+export const updateApplicationStatus = async (id, status) => {
+    return updateApplication(id, { status });
+};
+
+
 export const deleteApplication = async (id) => {
     const response = await api.delete(
         `/applications/${id}/`
