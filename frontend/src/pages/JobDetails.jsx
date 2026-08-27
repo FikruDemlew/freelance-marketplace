@@ -4,7 +4,10 @@ import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import ApplyModal from "../components/ApplyModal";
-import { getApplications } from "../services/application";
+import {
+    getApplications,
+    updateApplicationStatus,
+} from "../services/application";
 
 function JobDetails() {
     const { id } = useParams();
@@ -18,6 +21,7 @@ function JobDetails() {
     const [existingApplication, setExistingApplication] = useState(null);
     const [jobApplications, setJobApplications] = useState([]);
     const [applicationsLoading, setApplicationsLoading] = useState(false);
+    const [statusUpdating, setStatusUpdating] = useState(null);
     
 
 
@@ -94,6 +98,19 @@ const fetchJobApplications = async () => {
         setJobApplications([]);
     } finally {
         setApplicationsLoading(false);
+    }
+};
+
+const handleApplicationStatus = async (applicationId, status) => {
+    setStatusUpdating(applicationId);
+
+    try {
+        await updateApplicationStatus(applicationId, status);
+        await fetchJobApplications();
+    } catch (error) {
+        setError(error.response?.data?.detail || "Failed to update application status.");
+    } finally {
+        setStatusUpdating(null);
     }
 };
 
@@ -377,7 +394,13 @@ useEffect(() => {
                                                     </p>
                                                 </div>
                                                     
-                                                <span className="h-fit rounded-full bg-yellow-50 px-4 py-2 text-xs font-semibold text-yellow-700">
+                                                <span className={`h-fit rounded-full px-4 py-2 text-xs font-semibold ${
+                                                    application.status === "Accepted"
+                                                        ? "bg-green-50 text-green-700"
+                                                        : application.status === "Rejected"
+                                                        ? "bg-red-50 text-red-700"
+                                                        : "bg-yellow-50 text-yellow-700"
+                                                }`}>
                                                     {application.status}
                                                 </span>
                                             </div>
@@ -408,13 +431,17 @@ useEffect(() => {
                                 <div className="mt-6 flex gap-3 border-t border-gray-100 pt-5">
                                     <button
                                         type="button"
+                                        disabled={statusUpdating === application.id}
+                                        onClick={() => handleApplicationStatus(application.id, "Accepted")}
                                         className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
                                     >
-                                        Accept
+                                        {statusUpdating === application.id ? "Updating..." : "Accept"}
                                     </button>
 
                                     <button
                                         type="button"
+                                        disabled={statusUpdating === application.id}
+                                        onClick={() => handleApplicationStatus(application.id, "Rejected")}
                                         className="rounded-xl border border-red-200 px-5 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
                                     >
                                         Reject
