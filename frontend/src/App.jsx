@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
@@ -8,6 +8,7 @@ import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
 import Landing from "./pages/Landing";
 import MyApplications from "./pages/MyApplications";
+import MyJobs from "./pages/MyJobs";
 
 function App() {
     return (
@@ -62,6 +63,15 @@ function App() {
                 element={
                     <ProtectedRoute allowedRole="freelancer">
                         <MyApplications />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/my-jobs"
+                element={
+                    <ProtectedRoute allowedRole="client">
+                        <MyJobs />
                     </ProtectedRoute>
                 }
             />

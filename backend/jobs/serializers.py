@@ -8,6 +8,11 @@ class JobSerializer(serializers.ModelSerializer):
         source="client.username"
     )
 
+    applications_count = serializers.IntegerField(
+        source="applications.count",
+        read_only=True,
+    )
+
     class Meta:
         model = Job
 
@@ -20,6 +25,7 @@ class JobSerializer(serializers.ModelSerializer):
             "budget",
             "deadline",
             "status",
+            "applications_count",
             "created_at",
         ]
 
@@ -28,3 +34,21 @@ class JobSerializer(serializers.ModelSerializer):
             "client",
             "created_at",
         ]
+
+    def validate(self, attrs):
+        status = attrs.get("status")
+
+        if (
+            status == "Completed"
+            and self.instance
+            and self.instance.status != "In Progress"
+        ):
+            raise serializers.ValidationError(
+                {
+                    "status": (
+                        "Only an In Progress job can be marked Completed."
+                    )
+                }
+            )
+
+        return attrs

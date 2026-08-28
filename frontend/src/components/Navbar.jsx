@@ -62,12 +62,20 @@ function Navbar({ landing = false }) {
                             </span>
 
                             {user.role === "client" && (
-                                <Link
-                                    to="/jobs/create"
-                                    className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-primary-hover"
-                                >
-                                    Post a Job
-                                </Link>
+                                <>
+                                    <Link
+                                        to="/my-jobs"
+                                        className="text-sm font-semibold text-gray-300 transition hover:text-white"
+                                    >
+                                        My Jobs
+                                    </Link>
+                                    <Link
+                                        to="/jobs/create"
+                                        className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-primary-hover"
+                                    >
+                                        Post a Job
+                                    </Link>
+                                </>
                             )}
 
                         </div>

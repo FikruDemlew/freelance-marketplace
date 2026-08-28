@@ -6,6 +6,7 @@ from django.db import transaction
 from .models import Application
 from .serializers import ApplicationSerializer
 from .permissions import IsApplicationOwnerOrReadOnly
+from jobs.models import Job
 
 
 class ApplicationListCreateAPIView(
@@ -60,11 +61,31 @@ class ApplicationDetailAPIView(
 
     @transaction.atomic
     def perform_update(self, serializer):
+        job = Job.objects.select_for_update().get(
+            pk=serializer.instance.job_id
+        )
+
+        if serializer.validated_data.get("status") == "Accepted":
+            already_accepted = Application.objects.filter(
+                job=job,
+                status="Accepted",
+            ).exclude(
+                pk=serializer.instance.pk,
+            ).exists()
+
+            if already_accepted:
+                raise PermissionDenied(
+                    "This job already has an accepted application."
+                )
+
         application = serializer.save()
 
         if application.status == "Accepted":
+            job.status = "In Progress"
+            job.save(update_fields=["status"])
+
             Application.objects.filter(
-                job=application.job,
+                job=job,
                 status="Pending",
             ).exclude(
                 pk=application.pk,

@@ -22,6 +22,8 @@ function JobDetails() {
     const [jobApplications, setJobApplications] = useState([]);
     const [applicationsLoading, setApplicationsLoading] = useState(false);
     const [statusUpdating, setStatusUpdating] = useState(null);
+    const [completionUpdating, setCompletionUpdating] = useState(false);
+    const [success, setSuccess] = useState("");
     
 
 
@@ -103,6 +105,8 @@ const fetchJobApplications = async () => {
 
 const handleApplicationStatus = async (applicationId, status) => {
     setStatusUpdating(applicationId);
+    setError(null);
+    setSuccess("");
 
     try {
         await updateApplicationStatus(applicationId, status);
@@ -111,6 +115,36 @@ const handleApplicationStatus = async (applicationId, status) => {
         setError(error.response?.data?.detail || "Failed to update application status.");
     } finally {
         setStatusUpdating(null);
+    }
+};
+
+const handleCompleteJob = async () => {
+    const confirmed = window.confirm(
+        "Are you sure you want to mark this job as completed?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    setCompletionUpdating(true);
+    setError(null);
+    setSuccess("");
+
+    try {
+        const response = await api.patch(`/jobs/${id}/`, {
+            status: "Completed",
+        });
+        setJob(response.data);
+        setSuccess("Job marked as completed.");
+    } catch (error) {
+        setError(
+            error.response?.data?.status?.[0] ||
+                error.response?.data?.detail ||
+                "Failed to complete job."
+        );
+    } finally {
+        setCompletionUpdating(false);
     }
 };
 
@@ -194,6 +228,18 @@ useEffect(() => {
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
+
+            {(error || success) && (
+                <div className="mx-auto max-w-[1200px] px-6 pt-6 lg:px-10">
+                    <div className={`rounded-xl border p-4 text-sm ${
+                        error
+                            ? "border-red-200 bg-red-50 text-red-700"
+                            : "border-green-200 bg-green-50 text-green-700"
+                    }`}>
+                        {error || success}
+                    </div>
+                </div>
+            )}
 
             {/* Dark Header */}
             <section className="bg-black text-white">
@@ -291,6 +337,18 @@ useEffect(() => {
                             {/* Owner Actions */}
                             {isOwner && (
                                 <div className="mt-7 space-y-3">
+                                    {job.status === "In Progress" && (
+                                        <button
+                                            type="button"
+                                            disabled={completionUpdating}
+                                            onClick={handleCompleteJob}
+                                            className="flex w-full items-center justify-center rounded-xl bg-green-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            {completionUpdating
+                                                ? "Updating..."
+                                                : "Mark Job as Completed"}
+                                        </button>
+                                    )}
                                     <Link
                                         to={`/jobs/${id}/edit`}
                                         className="flex w-full items-center justify-center rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800"
@@ -350,7 +408,7 @@ useEffect(() => {
                 {user &&
                     user.role === "client" && (
                    
-                        <section className="mt-10">
+                        <section id="applications" className="mt-10">
                             <div className="mb-5">
                                 <h2 className="text-2xl font-bold text-gray-950">
                                     Applications

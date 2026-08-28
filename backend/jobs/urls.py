@@ -2,11 +2,18 @@ from django.urls import path
 
 from .views import (
     JobListCreateAPIView,
+    MyJobsListAPIView,
     JobDetailAPIView,
 )
 
 
 urlpatterns = [
+
+    path(
+        "my-jobs/",
+        MyJobsListAPIView.as_view(),
+        name="my-jobs",
+    ),
 
     path(
         "",

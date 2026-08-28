@@ -3,12 +3,12 @@ from rest_framework.exceptions import PermissionDenied
 
 from .models import Job
 from .serializers import JobSerializer
-from .permissions import IsJobOwnerOrReadOnly
+from .permissions import IsClient, IsJobOwnerOrReadOnly
 
 
 class JobListCreateAPIView(generics.ListCreateAPIView):
 
-    queryset = Job.objects.all()
+    queryset = Job.objects.filter(status="Open")
     serializer_class = JobSerializer
 
     permission_classes = [
@@ -25,6 +25,17 @@ class JobListCreateAPIView(generics.ListCreateAPIView):
         serializer.save(
             client=self.request.user
         )
+
+
+class MyJobsListAPIView(generics.ListAPIView):
+
+    serializer_class = JobSerializer
+    permission_classes = [IsClient]
+
+    def get_queryset(self):
+        return Job.objects.filter(
+            client=self.request.user
+        ).prefetch_related("applications")
 
 
 class JobDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
