@@ -18,6 +18,12 @@ class ApplicationWorkflowTests(TestCase):
 		)
 		Profile.objects.create(user=self.client_user, role="client")
 
+		self.other_client = User.objects.create_user(
+			username="other-client",
+			password="password",
+		)
+		Profile.objects.create(user=self.other_client, role="client")
+
 		self.first_freelancer = User.objects.create_user(
 			username="freelancer-one",
 			password="password",
@@ -82,8 +88,92 @@ class ApplicationWorkflowTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.first_application.refresh_from_db()
 		self.second_application.refresh_from_db()
+		self.job.refresh_from_db()
 		self.assertEqual(self.first_application.status, "Accepted")
 		self.assertEqual(self.second_application.status, "Rejected")
+		self.assertEqual(self.job.status, "In Progress")
+
+	def test_client_cannot_accept_another_application_after_acceptance(self):
+		self.api_client.force_authenticate(self.client_user)
+		self.first_application.status = "Accepted"
+		self.first_application.save(update_fields=["status"])
+
+		response = self.api_client.patch(
+			f"/api/applications/{self.second_application.id}/",
+			{"status": "Accepted"},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, 403)
+		self.second_application.refresh_from_db()
+		self.assertEqual(self.second_application.status, "Pending")
+
+	def test_only_job_owner_can_complete_in_progress_job(self):
+		self.job.status = "In Progress"
+		self.job.save(update_fields=["status"])
+		self.api_client.force_authenticate(self.client_user)
+
+		response = self.api_client.patch(
+			f"/api/jobs/{self.job.id}/",
+			{"status": "Completed"},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.job.refresh_from_db()
+		self.assertEqual(self.job.status, "Completed")
+
+	def test_open_job_cannot_be_completed_directly(self):
+		self.api_client.force_authenticate(self.client_user)
+
+		response = self.api_client.patch(
+			f"/api/jobs/{self.job.id}/",
+			{"status": "Completed"},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, 400)
+		self.job.refresh_from_db()
+		self.assertEqual(self.job.status, "Open")
+
+	def test_freelancer_cannot_complete_job(self):
+		self.job.status = "In Progress"
+		self.job.save(update_fields=["status"])
+		self.api_client.force_authenticate(self.first_freelancer)
+
+		response = self.api_client.patch(
+			f"/api/jobs/{self.job.id}/",
+			{"status": "Completed"},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_other_client_cannot_complete_job(self):
+		self.job.status = "In Progress"
+		self.job.save(update_fields=["status"])
+		self.api_client.force_authenticate(self.other_client)
+
+		response = self.api_client.patch(
+			f"/api/jobs/{self.job.id}/",
+			{"status": "Completed"},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, 403)
+
+	def test_completed_job_cannot_be_completed_again(self):
+		self.job.status = "Completed"
+		self.job.save(update_fields=["status"])
+		self.api_client.force_authenticate(self.client_user)
+
+		response = self.api_client.patch(
+			f"/api/jobs/{self.job.id}/",
+			{"status": "Completed"},
+			format="json",
+		)
+
+		self.assertEqual(response.status_code, 400)
 
 	def test_freelancer_cannot_change_application_status(self):
 		self.api_client.force_authenticate(self.first_freelancer)

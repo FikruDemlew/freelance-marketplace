@@ -217,6 +217,27 @@ function CreateJob() {
                                     Data Science
                                 </option>
 
+                                
+                                <option value="Sales & Lead Generation">
+                                    Sales & Lead Generation
+                                </option>
+                                
+                                <option value="Data & Analytics">
+                                    Data & Analytics
+                                </option>
+                                
+                                <option value="Data Science">
+                                    Data Science
+                                </option>
+                                
+                                <option value="Engineering & Architecture">
+                                    Engineering & Architecture
+                                </option>
+                                
+                                <option value="Business Consulting & Strategy">
+                                    Business Consulting & Strategy
+                                </option>
+                                
                                 <option value="Other">
                                     Other
                                 </option>

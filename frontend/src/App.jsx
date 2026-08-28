@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
@@ -9,6 +9,7 @@ import EditJob from "./pages/EditJob";
 import Landing from "./pages/Landing";
 import MyApplications from "./pages/MyApplications";
 import Messages from "./pages/Messages";
+import MyJobs from "./pages/MyJobs";
 
 function App() {
     return (
@@ -66,11 +67,20 @@ function App() {
                     </ProtectedRoute>
                 }
             />
-           <Route 
-    path="/chat/:conversationId" 
-    element={<Messages />} 
-/>
-   =
+
+            <Route
+                path="/chat/:conversationId"
+                element={<Messages />}
+            />
+
+            <Route
+                path="/my-jobs"
+                element={
+                    <ProtectedRoute allowedRole="client">
+                        <MyJobs />
+                    </ProtectedRoute>
+                }
+            />
         </Routes>
     );
 }

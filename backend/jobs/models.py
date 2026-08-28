@@ -10,12 +10,21 @@ class Job(models.Model):
         ("UI/UX Design", "UI/UX Design"),
         ("Graphics Design", "Graphics Design"),
         ("Writing", "Writing"),
+        ("Video Editing", "Video Editing"),
+        ("Music Production", "Music Production"),
+        ("Admin & Virtual Assistance", "Admin & Virtual Assistance"),
+        ("Sales & Lead Generation", "Sales & Lead Generation"),
+        ("Data & Analytics", "Data & Analytics"),
         ("Data Science", "Data Science"),
+        ("Engineering & Architecture", "Engineering & Architecture"),
+        ("Business Consulting & Strategy", "Business Consulting & Strategy"),
         ("Other", "Other"),
     ]
 
     STATUS_CHOICES = [
         ("Open", "Open"),
+        ("In Progress", "In Progress"),
+        ("Completed", "Completed"),
         ("Closed", "Closed"),
     ]
 
@@ -42,7 +51,7 @@ class Job(models.Model):
     deadline = models.DateField()
 
     status = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=STATUS_CHOICES,
         default="Open"
     )
