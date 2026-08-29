@@ -4,14 +4,16 @@ function Hero({
     selectedCategory,
     setSelectedCategory,
 }) {
-    const categories = [
-        "All Jobs",
-        "Web Development",
-        "Design",
-        "Writing",
-        "Marketing",
-        "Mobile Development",
-    ];
+   const categories = [
+    "All Jobs",
+    "Web Development",
+    "Mobile Development",
+    "UI/UX Design",
+    "Graphics Design",
+    "Writing",
+    "Data Science",
+    "Other",
+];
 
     return (
         <section className="relative overflow-hidden bg-black text-white">

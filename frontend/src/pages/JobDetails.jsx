@@ -8,6 +8,10 @@ import {
     getApplications,
     updateApplicationStatus,
 } from "../services/application";
+import {
+    getConversations,
+    createConversation,
+} from "../services/chat";
 
 function JobDetails() {
     const { id } = useParams();
@@ -22,6 +26,41 @@ function JobDetails() {
     const [jobApplications, setJobApplications] = useState([]);
     const [applicationsLoading, setApplicationsLoading] = useState(false);
     const [statusUpdating, setStatusUpdating] = useState(null);
+    const handleOpenConversation = async () => {
+    if (!existingApplication) {
+        return;
+    }
+
+    try {
+        const conversations = await getConversations();
+
+        // Check if conversation already exists
+        const existingConversation = conversations.find(
+            (conversation) =>
+                Number(conversation.application) ===
+                Number(existingApplication.id)
+        );
+
+        if (existingConversation) {
+            navigate(`/chat/${existingConversation.id}`);
+            return;
+        }
+
+        // Create conversation if it doesn't exist
+        const newConversation = await createConversation(
+            existingApplication.id
+        );
+
+        navigate(`/chat/${newConversation.id}`);
+    } catch (error) {
+        console.error("Failed to open conversation:", error);
+
+        setError(
+            error.response?.data?.detail ||
+            "Failed to open conversation."
+        );
+    }
+};
     
 
 
@@ -308,31 +347,63 @@ useEffect(() => {
                             )}
 
                             {/* Freelancer Actions */}
-                            {user && user.role === "freelancer" && (
-                                <div className="mt-7">
-                                    {existingApplication ? (
-                                        <div className="space-y-3">
-                                            <div className="w-full text-center px-4 py-2 bg-green-50 text-green-700 border border-green-200 font-medium text-sm rounded-xl">
-                                                ✓ Already Applied (Status:{" "}
-                                                {existingApplication.status})
-                                            </div>
-                                            <button
-                                                onClick={() => setIsApplyModalOpen(true)}
-                                                className="w-full rounded-xl bg-yellow-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-yellow-700"
-                                            >
-                                                Edit Application
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => setIsApplyModalOpen(true)}
-                                            className="w-full rounded-xl bg-green-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-green-700"
-                                        >
-                                            Apply for Job
-                                        </button>
-                                    )}
-                                </div>
-                            )}
+                            {/* Freelancer Actions */}
+{user && user.role === "freelancer" && (
+    <div className="mt-7">
+        {existingApplication ? (
+            <div className="space-y-3">
+
+                {/* Application Status */}
+                <div
+                    className={`w-full text-center px-4 py-3 border font-medium text-sm rounded-xl ${
+                        existingApplication.status === "Accepted"
+                            ? "bg-green-50 text-green-700 border-green-200"
+                            : existingApplication.status === "Rejected"
+                            ? "bg-red-50 text-red-700 border-red-200"
+                            : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                    }`}
+                >
+                    {existingApplication.status === "Accepted"
+                        ? "✓ Application Accepted"
+                        : existingApplication.status === "Rejected"
+                        ? "✕ Application Rejected"
+                        : "⏳ Application Pending"}
+                </div>
+
+                {/* Edit Application */}
+                {existingApplication.status !== "Accepted" && (
+                    <button
+                        type="button"
+                        onClick={() => setIsApplyModalOpen(true)}
+                        className="w-full rounded-xl bg-yellow-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-yellow-700"
+                    >
+                        Edit Application
+                    </button>
+                )}
+
+                {/* Message Client */}
+                {existingApplication.status === "Accepted" && (
+                    <button
+                        type="button"
+                        onClick={handleOpenConversation}
+                        className="w-full rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                    >
+                        Message Client
+                    </button>
+                )}
+
+            </div>
+        ) : (
+            <button
+                type="button"
+                onClick={() => setIsApplyModalOpen(true)}
+                className="w-full rounded-xl bg-green-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-green-700"
+            >
+                Apply for Job
+            </button>
+        )}
+    </div>
+)}
 
                             {/* Render Modal Overlay */}
                             {isApplyModalOpen && (
@@ -448,6 +519,49 @@ useEffect(() => {
                                     </button>
                                 </div>
                             )}
+                           {application.status === "Accepted" && (
+    <div className="mt-6 border-t border-gray-100 pt-5">
+        <button
+            type="button"
+            onClick={async () => {
+                try {
+                    const conversations = await getConversations();
+
+                    const existingConversation = conversations.find(
+                        (conversation) =>
+                            Number(conversation.application) ===
+                            Number(application.id)
+                    );
+
+                    if (existingConversation) {
+                        navigate(`/chat/${existingConversation.id}`);
+                        return;
+                    }
+
+                    const newConversation = await createConversation(
+                        application.id
+                    );
+
+                    navigate(`/chat/${newConversation.id}`);
+
+                } catch (error) {
+                    console.error(
+                        "Failed to open conversation:",
+                        error
+                    );
+
+                    setError(
+                        error.response?.data?.detail ||
+                        "Failed to open conversation."
+                    );
+                }
+            }}
+            className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+        >
+            Message Freelancer
+        </button>
+    </div>
+)}
                         </div>
                     ))}
                 </div>

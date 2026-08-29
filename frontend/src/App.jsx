@@ -8,6 +8,7 @@ import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
 import Landing from "./pages/Landing";
 import MyApplications from "./pages/MyApplications";
+import Messages from "./pages/Messages";
 
 function App() {
     return (
@@ -65,7 +66,10 @@ function App() {
                     </ProtectedRoute>
                 }
             />
-
+           <Route 
+    path="/chat/:conversationId" 
+    element={<Messages />} 
+/>
    =
         </Routes>
     );

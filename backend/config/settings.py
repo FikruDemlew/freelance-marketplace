@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
      # Custom apps
+    'notifications',
+    'chat',
     'accounts',
     'jobs',
     'proposals',

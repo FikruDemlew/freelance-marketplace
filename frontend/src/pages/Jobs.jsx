@@ -16,6 +16,10 @@ function Jobs() {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
+    const [minBudget, setMinBudget] = useState("");
+    const [maxBudget, setMaxBudget] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState("");
+    const [sortBy, setSortBy] = useState("newest");
 
     const { user, loading: authLoading } = useAuth();
 
@@ -52,8 +56,9 @@ function Jobs() {
     }
 
     // Filter jobs
-    const filteredJobs = jobs.filter((job) => {
-        const search = searchTerm.toLowerCase();
+    const filteredJobs = jobs
+    .filter((job) => {
+        const search = searchTerm.toLowerCase().trim();
 
         const matchesSearch =
             job.title.toLowerCase().includes(search) ||
@@ -64,7 +69,41 @@ function Jobs() {
             selectedCategory === "" ||
             job.category.toLowerCase() === selectedCategory.toLowerCase();
 
-        return matchesSearch && matchesCategory;
+        const matchesMinBudget =
+            minBudget === "" ||
+            Number(job.budget) >= Number(minBudget);
+
+        const matchesMaxBudget =
+            maxBudget === "" ||
+            Number(job.budget) <= Number(maxBudget);
+
+        const matchesStatus =
+            selectedStatus === "" ||
+            job.status.toLowerCase() === selectedStatus.toLowerCase();
+
+        return (
+            matchesSearch &&
+            matchesCategory &&
+            matchesMinBudget &&
+            matchesMaxBudget &&
+            matchesStatus
+        );
+    })
+    .sort((a, b) => {
+        if (sortBy === "budget-low") {
+            return Number(a.budget) - Number(b.budget);
+        }
+
+        if (sortBy === "budget-high") {
+            return Number(b.budget) - Number(a.budget);
+        }
+
+        if (sortBy === "deadline") {
+            return new Date(a.deadline) - new Date(b.deadline);
+        }
+
+        // Default: newest jobs first
+        return new Date(b.created_at) - new Date(a.created_at);
     });
 
     return (
@@ -134,10 +173,135 @@ function Jobs() {
             {/* ================= POPULAR JOBS ================= */}
             <section className="mx-auto max-w-[1400px] px-6 py-20 lg:px-10">
 
+
                 {/* Section Header */}
                 <div className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
 
-                    <div>
+                    <div>{/* ================= FILTERS ================= */}
+<div className="mx-auto max-w-[1400px] px-6 pt-10 lg:px-10">
+
+    <div className="rounded-3xl border border-gray-200 bg-gray-50 p-6">
+
+        <div className="mb-5 flex items-center justify-between">
+
+            <div>
+                <h3 className="text-lg font-bold text-gray-950">
+                    Filter Jobs
+                </h3>
+
+                <p className="mt-1 text-sm text-gray-500">
+                    Narrow down jobs based on your preferences.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+            {/* Minimum Budget */}
+            <div>
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
+                    Min Budget
+                </label>
+
+                <input
+                    type="number"
+                    min="0"
+                    value={minBudget}
+                    onChange={(e) => setMinBudget(e.target.value)}
+                    placeholder="e.g. 100"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-gray-400"
+                />
+            </div>
+
+
+            {/* Maximum Budget */}
+            <div>
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
+                    Max Budget
+                </label>
+
+                <input
+                    type="number"
+                    min="0"
+                    value={maxBudget}
+                    onChange={(e) => setMaxBudget(e.target.value)}
+                    placeholder="e.g. 1000"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-gray-400"
+                />
+            </div>
+
+
+            {/* Status */}
+            <div>
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
+                    Status
+                </label>
+
+                <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-gray-400"
+                >
+                    <option value="">All Statuses</option>
+                    <option value="Open">Open</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+
+
+            {/* Sort */}
+            <div>
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
+                    Sort By
+                </label>
+
+                <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-gray-400"
+                >
+                    <option value="newest">
+                        Newest
+                    </option>
+
+                    <option value="budget-low">
+                        Budget: Low to High
+                    </option>
+
+                    <option value="budget-high">
+                        Budget: High to Low
+                    </option>
+
+                    <option value="deadline">
+                        Deadline: Soonest
+                    </option>
+                </select>
+            </div>
+
+        </div>
+
+
+        {/* Clear Filters */}
+        <button
+            type="button"
+            onClick={() => {
+                setSearchTerm("");
+                setSelectedCategory("");
+                setMinBudget("");
+                setMaxBudget("");
+                setSelectedStatus("");
+                setSortBy("newest");
+            }}
+            className="mt-5 rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+        >
+            Clear All Filters
+        </button>
+
+    </div>
+
+</div>
 
                         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-gray-400">
                             Explore opportunities
