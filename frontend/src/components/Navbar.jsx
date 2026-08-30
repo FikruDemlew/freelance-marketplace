@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { useTheme } from "../context/useTheme";
 
 function Navbar({ landing = false }) {
     const { user } = useAuth();
+    const { theme, toggleTheme } = useTheme();
 
     return (
-        <nav className={`relative z-50 text-white ${landing ? "bg-transparent" : "border-b border-white/10 bg-black"}`}>
+        <nav className={`relative z-50 border-b border-border text-white ${landing ? "bg-transparent" : "bg-ink/95 backdrop-blur"}`}>
 
             <div className="mx-auto flex h-20 max-w-350 items-center justify-between px-6 lg:px-10">
 
@@ -14,9 +16,9 @@ function Navbar({ landing = false }) {
                     to="/jobs"
                     className="flex items-center gap-2 text-white"
                 >
-                    {landing && <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-lg text-black">↗</span>}
-                    <span className={landing ? "font-audiowide text-sm tracking-wide" : "text-2xl font-bold tracking-tight"}>
-                        {landing ? "OCEAN JOBS" : "FreelanceHub"}
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-lg font-black text-[#07130c]">↗</span>
+                    <span className="font-display text-xl font-bold tracking-tight">
+                        Freelance<span className="text-primary">Hub</span>
                     </span>
                 </Link>
 
@@ -53,6 +55,16 @@ function Navbar({ landing = false }) {
                 {/* Right side */}
                 <div className="flex items-center gap-3">
 
+                    <button
+                        type="button"
+                        onClick={toggleTheme}
+                        aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+                        title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg text-white transition hover:border-primary hover:text-primary"
+                    >
+                        {theme === "dark" ? "☀" : "☾"}
+                    </button>
+
                     {user ? (
 
                         <div className="flex items-center gap-4">
@@ -71,7 +83,7 @@ function Navbar({ landing = false }) {
                                     </Link>
                                     <Link
                                         to="/jobs/create"
-                                        className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-primary-hover"
+                                        className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-[#07130c] transition hover:bg-primary-hover"
                                     >
                                         Post a Job
                                     </Link>
@@ -92,7 +104,7 @@ function Navbar({ landing = false }) {
 
                             <Link
                                 to="/register"
-                                className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${landing ? "bg-primary text-black hover:bg-primary-hover" : "bg-white text-black hover:bg-gray-200"}`}
+                                className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-[#07130c] transition hover:bg-primary-hover"
                             >
                                 {landing ? "Register" : "Get Started"}
                             </Link>

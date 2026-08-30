@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Metamorphous&family=Revalia&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -17,8 +17,61 @@
 
   /* Borders & Outlines */
   --color-border: #2e2e38;     
+  --color-ink: #0c0c0f;
     
-   --font-audiowide: "Audiowide", sans-serif;
-  --font-metamorphous: "Metamorphous", serif;
-  --font-revalia: "Revalia", sans-serif;    /* Card borders and input outlines */
+  --font-sans: "Manrope", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+}
+
+:root {
+  --color-background: #121214;
+  --color-surface: #1e1e24;
+  --color-surface-hover: #292932;
+  --color-text-main: #ffffff;
+  --color-text-muted: #9ca3af;
+  --color-border: #2e2e38;
+  --color-ink: #0c0c0f;
+}
+
+body[data-theme="light"] {
+  --color-background: #f4f6f5;
+  --color-surface: #ffffff;
+  --color-surface-hover: #edf1ee;
+  --color-text-main: #17211b;
+  --color-text-muted: #65736a;
+  --color-border: #d8e0db;
+  --color-ink: #111714;
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body { background: var(--color-background); color: var(--color-text-main); font-family: var(--font-sans); }
+  h1, h2, h3 { font-family: var(--font-display); }
+}
+
+/* Compatibility palette for the existing screens: the semantic theme stays
+   consistent without duplicating a second set of components. */
+@layer utilities {
+  .bg-white, .bg-gray-50, .bg-slate-50 { background-color: var(--color-surface) !important; }
+  .bg-gray-100, .bg-slate-100 { background-color: var(--color-surface-hover) !important; }
+  .bg-gray-950, .bg-black { background-color: var(--color-ink) !important; }
+  .text-gray-950, .text-gray-900, .text-slate-900 { color: var(--color-text-main) !important; }
+  .text-gray-700, .text-gray-600, .text-slate-700 { color: #c4c5cb !important; }
+  .text-gray-500, .text-gray-400, .text-slate-500 { color: var(--color-text-muted) !important; }
+  .border-gray-100, .border-gray-200, .border-gray-300, .border-slate-200, .border-slate-300 { border-color: var(--color-border) !important; }
+  .hover\:bg-gray-50:hover, .hover\:bg-gray-100:hover, .hover\:bg-gray-800:hover { background-color: var(--color-surface-hover) !important; }
+  .focus\:border-gray-950:focus, .focus\:border-black:focus { border-color: var(--color-primary) !important; }
+  .bg-green-600, .bg-green-500, .bg-cyan-800 { background-color: var(--color-primary) !important; }
+  .hover\:bg-green-700:hover, .hover\:bg-cyan-700:hover { background-color: var(--color-primary-hover) !important; }
+  .text-green-700, .text-green-800, .text-green-900 { color: #82e6ad !important; }
+  .bg-green-50 { background-color: rgb(0 192 88 / 0.12) !important; }
+  .border-green-200 { border-color: rgb(0 192 88 / 0.35) !important; }
+
+  .job-card-title { color: var(--color-text-main); }
+  .job-card-copy { color: var(--color-text-muted); }
+  .job-card-meta { color: var(--color-text-muted); }
+
+  body[data-theme="light"] .job-card-title { color: #14241a; }
+  body[data-theme="light"] .job-card-copy { color: #234a32; }
+  body[data-theme="light"] .job-card-meta { color: #39704b; }
 }

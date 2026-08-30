@@ -4,10 +4,12 @@ import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import ApplyModal from "../components/ApplyModal";
+import ReviewModal from "../components/ReviewModal";
 import {
     getApplications,
     updateApplicationStatus,
 } from "../services/application";
+import { getReviews } from "../services/review";
 
 function JobDetails() {
     const { id } = useParams();
@@ -24,6 +26,9 @@ function JobDetails() {
     const [statusUpdating, setStatusUpdating] = useState(null);
     const [completionUpdating, setCompletionUpdating] = useState(false);
     const [success, setSuccess] = useState("");
+    const [review, setReview] = useState(null);
+    const [reviewLoading, setReviewLoading] = useState(false);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     
 
 
@@ -46,6 +51,23 @@ function JobDetails() {
 
         fetchJob();
     }, [id]);
+
+    const fetchJobReview = async () => {
+        if (!job) {
+            return;
+        }
+
+        setReviewLoading(true);
+        try {
+            const reviews = await getReviews({ job: job.id });
+            setReview(reviews[0] || null);
+        } catch (requestError) {
+            console.error("Failed to load review:", requestError);
+            setReview(null);
+        } finally {
+            setReviewLoading(false);
+        }
+    };
 
     // 2. Fetch Application Status (Only runs AFTER job is loaded)
 const fetchUserApplications = async () => {
@@ -154,6 +176,12 @@ useEffect(() => {
     }
 }, [job, user]);
 
+    useEffect(() => {
+        if (job) {
+            fetchJobReview();
+        }
+    }, [job]);
+
     // Trigger application check when the job data changes
     useEffect(() => {
         if (job) {
@@ -224,6 +252,12 @@ useEffect(() => {
         user &&
         (user.username === jobClientUsername ||
             String(user.id) === String(job.client));
+    const canReview = user?.role === "client" && isOwner && job.status === "Completed";
+
+    const handleReviewSuccess = (createdReview) => {
+        setReview(createdReview);
+        setSuccess("Review submitted successfully.");
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -349,6 +383,29 @@ useEffect(() => {
                                                 : "Mark Job as Completed"}
                                         </button>
                                     )}
+                                    {canReview && (
+                                        reviewLoading ? (
+                                            <div className="rounded-xl bg-gray-100 px-5 py-3.5 text-center text-sm font-medium text-gray-500">
+                                                Loading review...
+                                            </div>
+                                        ) : review ? (
+                                            <div className="rounded-xl border border-green-200 bg-green-50 p-4">
+                                                <p className="text-sm font-semibold text-green-800">Review Submitted</p>
+                                                <p className="mt-2 text-lg tracking-wide text-yellow-500">
+                                                    {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
+                                                </p>
+                                                <p className="mt-2 text-sm leading-6 text-green-900">{review.comment}</p>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsReviewModalOpen(true)}
+                                                className="flex w-full items-center justify-center rounded-xl bg-yellow-500 px-5 py-3.5 text-sm font-semibold text-gray-950 transition hover:bg-yellow-400"
+                                            >
+                                                Leave a Review
+                                            </button>
+                                        )
+                                    )}
                                     <Link
                                         to={`/jobs/${id}/edit`}
                                         className="flex w-full items-center justify-center rounded-xl bg-black px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800"
@@ -400,6 +457,13 @@ useEffect(() => {
                                     existingApplication={existingApplication}
                                     onClose={() => setIsApplyModalOpen(false)}
                                     onSuccess={fetchUserApplications}
+                                />
+                            )}
+                            {isReviewModalOpen && (
+                                <ReviewModal
+                                    jobId={job.id}
+                                    onClose={() => setIsReviewModalOpen(false)}
+                                    onSuccess={handleReviewSuccess}
                                 />
                             )}
                         </div>

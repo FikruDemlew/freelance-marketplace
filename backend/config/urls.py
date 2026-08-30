@@ -54,6 +54,10 @@ urlpatterns = [
     path(
         "api/applications/",
         include("applications.urls")
-    )
+    ),
+    path(
+        "api/reviews/",
+        include("reviews.urls")
+    ),
 
 ]
