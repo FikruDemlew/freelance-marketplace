@@ -2,19 +2,19 @@ import Navbar from '../components/Navbar'
 
 function Landing() {
     return (
-        <div className="min-h-screen overflow-hidden bg-[#101211] text-white">
+        <div className="min-h-screen overflow-hidden bg-background text-white">
             <div className="absolute inset-x-0 top-0 z-30">
             <Navbar landing />
             </div>
-            <section className="relative isolate min-h-screen overflow-hidden bg-[#071d13] bg-[radial-gradient(#173b28_3px,transparent_3px)] bg-size-[28px_28px]">
-                <div aria-hidden="true" className="pointer-events-none absolute inset-x-5 top-40 z-10 mx-auto max-w-6xl text-center font-audiowide text-[clamp(2.8rem,7.8vw,7.5rem)] font-bold leading-[0.9] tracking-normal sm:inset-x-10 sm:top-44">
+            <section className="relative isolate min-h-screen overflow-hidden bg-ink bg-[radial-gradient(#1d3427_2px,transparent_2px)] bg-size-[28px_28px]">
+                <div aria-hidden="true" className="pointer-events-none absolute inset-x-5 top-40 z-10 mx-auto max-w-6xl text-center font-display text-[clamp(2.8rem,7.8vw,7.5rem)] font-bold leading-[0.9] tracking-normal sm:inset-x-10 sm:top-44">
                     <span className="block">NEW <span className="text-primary">WAVE</span> IN THE</span>
                     <span className="mt-3 block whitespace-nowrap text-[clamp(2.15rem,7vw,6.8rem)]">FREEL<span className="text-transparent" style={{ WebkitTextStroke: '2px white' }}>ANCE</span> WORLD</span>
                 </div>
                 <img src="/BG2.png" className="pointer-events-none absolute inset-0 z-20 h-full w-full object-cover object-center" alt="Freelancer holding a tablet" />
                 <div className="relative z-30 mx-auto flex min-h-screen max-w-7xl flex-col items-center px-5 pb-12 pt-32 text-center sm:px-10 sm:pt-36">
-                    <p className="font-audiowide text-xs uppercase tracking-[0.22em] text-primary sm:text-sm">The future of work</p>
-                    <div aria-hidden="true" className="pointer-events-none absolute inset-x-5 top-40 mx-auto max-w-6xl text-center font-audiowide text-[clamp(2.8rem,7.8vw,7.5rem)] font-bold leading-[0.9] tracking-normal sm:inset-x-10 sm:top-44">
+                    <p className="font-display text-xs uppercase tracking-[0.22em] text-primary sm:text-sm">The future of work</p>
+                    <div aria-hidden="true" className="pointer-events-none absolute inset-x-5 top-40 mx-auto max-w-6xl text-center font-display text-[clamp(2.8rem,7.8vw,7.5rem)] font-bold leading-[0.9] tracking-normal sm:inset-x-10 sm:top-44">
                         <span className="block text-transparent">NEW <span className="text-transparent">WAVE</span> IN THE</span>
                         <span className="mt-3 block whitespace-nowrap text-[clamp(2.15rem,7vw,6.8rem)] text-transparent">FREEL<span className="text-transparent " style={{ WebkitTextStroke: '2px white' }}>ANCE</span> WORLD</span>
                     </div>
@@ -43,4 +43,4 @@ function Landing() {
     )
 }
 
-export default Landing 
+export default Landing

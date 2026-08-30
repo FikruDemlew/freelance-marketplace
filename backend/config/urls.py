@@ -57,7 +57,10 @@ urlpatterns = [
     ),
     path(
         "api/chat/",
-     include("chat.urls")),
-    
-
+        include("chat.urls")
+    ),
+    path(
+        "api/reviews/",
+        include("reviews.urls")
+    ),
 ]
