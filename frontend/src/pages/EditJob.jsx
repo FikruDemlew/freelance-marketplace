@@ -85,17 +85,12 @@ function EditJob() {
     // Loading state
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-background">
                 <Navbar />
 
-                <div className="mx-auto max-w-[1100px] px-6 py-20 text-center">
-
-                    <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-black" />
-
-                    <p className="mt-4 text-sm text-gray-500">
-                        Loading job...
-                    </p>
-
+                <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+                    <div className="spinner" />
+                    <p className="text-sm text-text-muted">Loading job details…</p>
                 </div>
             </div>
         );
@@ -104,18 +99,18 @@ function EditJob() {
     // Error while loading
     if (error && !formData.title) {
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-background">
                 <Navbar />
 
                 <div className="mx-auto max-w-[900px] px-6 py-20">
 
-                    <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+                    <div className="rounded-3xl border border-red-500/25 bg-red-500/10 p-8 text-center">
 
-                        <h2 className="text-xl font-bold text-red-900">
+                        <h2 className="font-display text-xl font-bold text-red-400">
                             Unable to load job
                         </h2>
 
-                        <p className="mt-2 text-sm text-red-700">
+                        <p className="mt-2 text-sm text-red-300">
                             {typeof error === "string"
                                 ? error
                                 : JSON.stringify(error)}
@@ -123,7 +118,7 @@ function EditJob() {
 
                         <Link
                             to="/jobs"
-                            className="mt-6 inline-flex rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+                            className="mt-6 inline-flex rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-[#07130c] transition-all duration-200 hover:bg-primary-hover"
                         >
                             Back to Jobs
                         </Link>
@@ -136,34 +131,34 @@ function EditJob() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background">
 
             {/* Navbar */}
             <Navbar />
 
             {/* Page Header */}
-            <section className="bg-black text-white">
+            <section className="border-b border-border bg-ink text-white">
 
                 <div className="mx-auto max-w-[1400px] px-6 py-14 lg:px-10">
 
                     <Link
                         to={`/jobs/${id}`}
-                        className="inline-flex items-center text-sm font-medium text-gray-400 transition hover:text-white"
+                        className="inline-flex items-center text-xs font-semibold text-text-muted transition-colors hover:text-primary"
                     >
-                        ← Back to Job
+                        ← Back to Job Details
                     </Link>
 
-                    <div className="mt-8 max-w-3xl">
+                    <div className="mt-6 max-w-3xl">
 
-                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
                             Manage Project
                         </p>
 
-                        <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+                        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
                             Edit your job
                         </h1>
 
-                        <p className="mt-5 max-w-2xl text-base leading-7 text-gray-400 sm:text-lg">
+                        <p className="mt-4 max-w-2xl text-base leading-7 text-text-muted">
                             Update your project details and make sure
                             freelancers have the information they need.
                         </p>
@@ -175,18 +170,18 @@ function EditJob() {
             </section>
 
             {/* Form */}
-            <main className="mx-auto max-w-[1100px] px-6 py-12 lg:px-10 lg:py-16">
+            <main className="mx-auto max-w-[1000px] px-6 py-12 lg:px-10 lg:py-16">
 
-                <div className="rounded-[28px] border border-gray-200 bg-white p-6 shadow-sm sm:p-10">
+                <div className="rounded-3xl border border-border bg-surface p-6 shadow-xl sm:p-10">
 
                     {/* Form heading */}
-                    <div className="mb-10 border-b border-gray-100 pb-8">
+                    <div className="mb-10 border-b border-border pb-8">
 
-                        <h2 className="text-2xl font-bold tracking-tight text-gray-950">
+                        <h2 className="font-display text-2xl font-bold tracking-tight text-text-main">
                             Job information
                         </h2>
 
-                        <p className="mt-2 text-sm text-gray-500">
+                        <p className="mt-2 text-sm text-text-muted">
                             Make changes to your job information below.
                         </p>
 
@@ -194,9 +189,9 @@ function EditJob() {
 
                     {/* Update error */}
                     {error && (
-                        <div className="mb-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
+                        <div className="mb-8 rounded-xl border border-red-500/25 bg-red-500/10 px-5 py-4">
 
-                            <p className="text-sm font-medium text-red-700">
+                            <p className="text-sm font-medium text-red-400">
                                 {typeof error === "string"
                                     ? error
                                     : JSON.stringify(error)}
@@ -215,7 +210,7 @@ function EditJob() {
 
                             <label
                                 htmlFor="title"
-                                className="mb-2 block text-sm font-semibold text-gray-900"
+                                className="mb-2 block text-sm font-semibold text-text-main"
                             >
                                 Job Title
                             </label>
@@ -227,7 +222,7 @@ function EditJob() {
                                 value={formData.title}
                                 onChange={handleChange}
                                 required
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                className="field"
                             />
 
                         </div>
@@ -237,7 +232,7 @@ function EditJob() {
 
                             <label
                                 htmlFor="description"
-                                className="mb-2 block text-sm font-semibold text-gray-900"
+                                className="mb-2 block text-sm font-semibold text-text-main"
                             >
                                 Project Description
                             </label>
@@ -249,7 +244,7 @@ function EditJob() {
                                 onChange={handleChange}
                                 required
                                 rows={7}
-                                className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm leading-6 text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                className="field resize-none leading-6"
                             />
 
                         </div>
@@ -259,7 +254,7 @@ function EditJob() {
 
                             <label
                                 htmlFor="category"
-                                className="mb-2 block text-sm font-semibold text-gray-900"
+                                className="mb-2 block text-sm font-semibold text-text-main"
                             >
                                 Category
                             </label>
@@ -269,7 +264,7 @@ function EditJob() {
                                 name="category"
                                 value={formData.category}
                                 onChange={handleChange}
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                className="field"
                             >
 
                                 <option value="Web Development">
@@ -312,14 +307,14 @@ function EditJob() {
 
                                 <label
                                     htmlFor="budget"
-                                    className="mb-2 block text-sm font-semibold text-gray-900"
+                                    className="mb-2 block text-sm font-semibold text-text-main"
                                 >
-                                    Budget
+                                    Budget <span className="font-normal text-text-muted">(USD)</span>
                                 </label>
 
                                 <div className="relative">
 
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-text-muted">
                                         $
                                     </span>
 
@@ -332,7 +327,7 @@ function EditJob() {
                                         min="0"
                                         step="0.01"
                                         required
-                                        className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-9 pr-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                        className="field pl-9"
                                     />
 
                                 </div>
@@ -344,7 +339,7 @@ function EditJob() {
 
                                 <label
                                     htmlFor="deadline"
-                                    className="mb-2 block text-sm font-semibold text-gray-900"
+                                    className="mb-2 block text-sm font-semibold text-text-main"
                                 >
                                     Deadline
                                 </label>
@@ -356,7 +351,7 @@ function EditJob() {
                                     value={formData.deadline}
                                     onChange={handleChange}
                                     required
-                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                    className="field"
                                 />
 
                             </div>
@@ -364,12 +359,12 @@ function EditJob() {
                         </div>
 
                         {/* Buttons */}
-                        <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-8 sm:flex-row sm:justify-end">
+                        <div className="flex flex-col-reverse gap-3 border-t border-border pt-8 sm:flex-row sm:justify-end">
 
                             <button
                                 type="button"
                                 onClick={() => navigate(`/jobs/${id}`)}
-                                className="rounded-xl border border-gray-200 px-6 py-3.5 text-sm font-semibold text-gray-700 transition hover:border-gray-400 hover:bg-gray-50"
+                                className="rounded-xl border border-border px-6 py-3 text-sm font-semibold text-text-muted transition-all duration-200 hover:border-primary/30 hover:text-text-main"
                             >
                                 Cancel
                             </button>
@@ -377,7 +372,7 @@ function EditJob() {
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="rounded-xl bg-black px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-xl bg-primary px-7 py-3 text-sm font-bold text-[#07130c] transition-all duration-200 hover:bg-primary-hover hover:shadow-[0_0_16px_rgba(0,192,88,0.35)] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {saving
                                     ? "Updating..."

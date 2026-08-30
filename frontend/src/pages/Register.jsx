@@ -18,11 +18,7 @@ function Register() {
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleSubmit = async (event) => {
@@ -45,63 +41,74 @@ function Register() {
     };
 
     return (
-        <div className="min-h-screen grid lg:grid-cols-[1.1fr_1.4fr] bg-[#f5f7fb] text-slate-800">
+        <div className="grid min-h-screen bg-background text-text-main lg:grid-cols-[1.1fr_1.4fr]">
+
+            {/* Left panel — hero image */}
             <div
                 className="relative hidden lg:flex items-end justify-start overflow-hidden bg-cover bg-center"
                 style={{ backgroundImage: "url('/working.jpg')" }}
             >
-                <div className="absolute inset-0 bg-slate-900/55" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/50 to-transparent" />
 
-                <div className="relative z-10 max-w-md p-10 text-white">
-                    <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm">
-                        ConnectFreelance
-                    </span>
+                <div className="relative z-10 max-w-md p-10 pb-12 text-white">
+                    <Link to="/" className="inline-flex items-center gap-2 group">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-black text-[#07130c] transition-all duration-200 group-hover:shadow-[0_0_14px_rgba(0,192,88,0.5)]">↗</span>
+                        <span className="font-display text-lg font-bold text-white">Freelance<span className="text-primary">Hub</span></span>
+                    </Link>
 
-                    <h1 className="mt-6 text-4xl font-bold leading-tight">
+                    <h1 className="mt-8 font-display text-4xl font-bold leading-tight tracking-tight">
                         Start your next opportunity.
                     </h1>
 
-                    <p className="mt-4 text-base text-slate-200">
+                    <p className="mt-4 text-base leading-7 text-slate-300">
                         Join a thriving network of clients and freelancers building exceptional work together.
                     </p>
 
-                    <div className="mt-8 flex items-center gap-4 rounded-2xl border border-white/20 bg-white/5 p-4 backdrop-blur-sm">
+                    <div className="mt-8 flex items-center gap-4 rounded-2xl border border-white/12 bg-white/6 p-4 backdrop-blur-sm">
                         <div className="flex -space-x-2">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-cyan-500 text-sm font-semibold">C</span>
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-violet-500 text-sm font-semibold">F</span>
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-emerald-500 text-sm font-semibold">+ </span>
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-900 bg-primary text-sm font-bold text-[#07130c]">C</span>
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-900 bg-violet-500 text-sm font-semibold text-white">F</span>
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-900 bg-blue-500 text-sm font-semibold text-white">+</span>
                         </div>
-                        <p className="text-sm text-slate-100">
+                        <p className="text-sm text-slate-200">
                             Join <span className="font-semibold text-white">10k+</span> professionals already growing here
                         </p>
                     </div>
                 </div>
             </div>
 
+            {/* Right panel — form */}
             <div className="flex min-h-screen items-center justify-center p-6 sm:p-10">
-                <div className="w-full max-w-lg rounded-[28px] border border-slate-200 bg-white p-8 shadow-[0_25px_60px_rgba(15,23,42,0.12)] sm:p-10">
+                <div className="w-full max-w-md">
+
+                    {/* Mobile logo */}
+                    <Link to="/" className="mb-8 flex items-center gap-2 lg:hidden">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-black text-[#07130c]">↗</span>
+                        <span className="font-display text-lg font-bold text-text-main">Freelance<span className="text-primary">Hub</span></span>
+                    </Link>
+
                     <div className="mb-8">
-                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">Create account</p>
-                        <h2 className="mt-3 text-3xl font-bold text-slate-900">Join ConnectFreelance</h2>
-                        <p className="mt-2 text-sm text-slate-500">
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Create account</p>
+                        <h2 className="mt-3 font-display text-3xl font-bold text-text-main">Join FreelanceHub</h2>
+                        <p className="mt-2 text-sm text-text-muted">
                             Create your profile and start connecting with the right opportunities today.
                         </p>
                     </div>
 
                     {error && (
-                        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        <div className="mb-5 rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-400">
                             {typeof error === "string" ? error : JSON.stringify(error)}
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div className="space-y-2">
-                            <label htmlFor="username" className="text-sm font-medium text-slate-700">
+                            <label htmlFor="username" className="text-sm font-semibold text-text-main">
                                 Username
                             </label>
                             <input
                                 id="username"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100"
+                                className="field"
                                 type="text"
                                 name="username"
                                 value={formData.username}
@@ -112,12 +119,12 @@ function Register() {
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium text-slate-700">
+                            <label htmlFor="email" className="text-sm font-semibold text-text-main">
                                 Email address
                             </label>
                             <input
                                 id="email"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100"
+                                className="field"
                                 type="email"
                                 name="email"
                                 value={formData.email}
@@ -128,49 +135,67 @@ function Register() {
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium text-slate-700">
+                            <label htmlFor="password" className="text-sm font-semibold text-text-main">
                                 Password
                             </label>
                             <input
                                 id="password"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100"
+                                className="field"
                                 type="password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                placeholder="Create a password"
+                                placeholder="Create a strong password"
                                 required
                             />
                         </div>
 
+                        {/* Account type — visual role cards */}
                         <div className="space-y-2">
-                            <label htmlFor="role" className="text-sm font-medium text-slate-700">
+                            <label className="text-sm font-semibold text-text-main">
                                 Account Type
                             </label>
-                            <select
-                                id="role"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-100"
-                                name="role"
-                                value={formData.role}
-                                onChange={handleChange}
-                            >
-                                <option value="client">Client</option>
-                                <option value="freelancer">Freelancer</option>
-                            </select>
+                            <div className="grid grid-cols-2 gap-3">
+                                {[
+                                    { value: "client", label: "Client", desc: "I want to hire", icon: "💼" },
+                                    { value: "freelancer", label: "Freelancer", desc: "I want to work", icon: "💻" },
+                                ].map((opt) => (
+                                    <label
+                                        key={opt.value}
+                                        className={`flex cursor-pointer flex-col gap-1 rounded-xl border p-4 transition-all duration-200 ${
+                                            formData.role === opt.value
+                                                ? "border-primary/50 bg-primary/8 shadow-[0_0_12px_rgba(0,192,88,0.12)]"
+                                                : "border-border bg-surface-hover hover:border-border-subtle hover:bg-surface-elevated"
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="role"
+                                            value={opt.value}
+                                            checked={formData.role === opt.value}
+                                            onChange={handleChange}
+                                            className="sr-only"
+                                        />
+                                        <span className="text-xl">{opt.icon}</span>
+                                        <span className="text-sm font-semibold text-text-main">{opt.label}</span>
+                                        <span className="text-xs text-text-muted">{opt.desc}</span>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
 
                         <button
-                            className="w-full rounded-full bg-cyan-800 px-4 py-3 text-base font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="mt-1 w-full rounded-full bg-primary px-4 py-3 text-sm font-bold text-[#07130c] transition-all duration-200 hover:bg-primary-hover hover:shadow-[0_0_20px_rgba(0,192,88,0.35)] disabled:cursor-not-allowed disabled:opacity-70"
                             type="submit"
                             disabled={loading}
                         >
-                            {loading ? "Creating account..." : "Register"}
+                            {loading ? "Creating account…" : "Create Account"}
                         </button>
                     </form>
 
-                    <p className="mt-8 text-center text-sm text-slate-600">
+                    <p className="mt-8 text-center text-sm text-text-muted">
                         Already have an account?{" "}
-                        <Link className="font-semibold text-cyan-700 hover:text-cyan-800" to="/login">
+                        <Link className="font-semibold text-primary transition-colors hover:text-primary-hover" to="/login">
                             Login
                         </Link>
                     </p>

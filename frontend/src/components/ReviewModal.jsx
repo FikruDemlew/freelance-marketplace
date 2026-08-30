@@ -5,6 +5,7 @@ import { createReview } from "../services/review";
 
 function ReviewModal({ jobId, onClose, onSuccess }) {
     const [rating, setRating] = useState(0);
+    const [hovered, setHovered] = useState(0);
     const [comment, setComment] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
@@ -34,16 +35,19 @@ function ReviewModal({ jobId, onClose, onSuccess }) {
         }
     };
 
+    const displayRating = hovered || rating;
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}>
             <form
                 onSubmit={handleSubmit}
-                className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+                className="w-full max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-2xl sm:p-8"
             >
+                {/* Header */}
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-950">Leave a Review</h2>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <h2 className="font-display text-xl font-bold text-text-main">Leave a Review</h2>
+                        <p className="mt-1 text-sm text-text-muted">
                             Share how working with this freelancer went.
                         </p>
                     </div>
@@ -51,49 +55,60 @@ function ReviewModal({ jobId, onClose, onSuccess }) {
                         type="button"
                         onClick={onClose}
                         aria-label="Close review form"
-                        className="text-2xl leading-none text-gray-400 hover:text-gray-700"
+                        className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-text-muted transition-colors hover:border-primary/40 hover:text-text-main"
                     >
                         ×
                     </button>
                 </div>
 
+                {/* Stars */}
                 <fieldset className="mt-7">
-                    <legend className="text-sm font-semibold text-gray-900">Rating</legend>
-                    <div className="mt-2 flex gap-1" aria-label="Select a rating from 1 to 5">
+                    <legend className="mb-3 text-sm font-semibold text-text-main">Rating</legend>
+                    <div className="flex gap-1" aria-label="Select a rating from 1 to 5">
                         {[1, 2, 3, 4, 5].map((star) => (
                             <button
                                 key={star}
                                 type="button"
                                 onClick={() => setRating(star)}
+                                onMouseEnter={() => setHovered(star)}
+                                onMouseLeave={() => setHovered(0)}
                                 aria-label={`${star} star${star === 1 ? "" : "s"}`}
-                                className={`text-4xl leading-none transition ${
-                                    star <= rating ? "text-yellow-400" : "text-gray-300"
+                                className={`text-4xl leading-none transition-all duration-150 hover:scale-110 ${
+                                    star <= displayRating ? "text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.6)]" : "text-text-subtle"
                                 }`}
                             >
                                 ★
                             </button>
                         ))}
                     </div>
+                    {displayRating > 0 && (
+                        <p className="mt-2 text-xs text-text-muted">
+                            {["", "Poor", "Fair", "Good", "Very Good", "Excellent"][displayRating]}
+                        </p>
+                    )}
                 </fieldset>
 
-                <label className="mt-6 block text-sm font-semibold text-gray-900">
-                    Comment
+                {/* Comment */}
+                <div className="mt-6">
+                    <label className="mb-2 block text-sm font-semibold text-text-main">
+                        Comment
+                    </label>
                     <textarea
                         value={comment}
                         onChange={(event) => setComment(event.target.value)}
                         maxLength={1000}
                         required
                         rows={5}
-                        className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-black"
-                        placeholder="Great communication and delivered on time."
+                        className="field resize-none"
+                        placeholder="Great communication and delivered on time..."
                     />
-                    <span className="mt-1 block text-right text-xs font-normal text-gray-400">
+                    <span className="mt-1 block text-right text-xs text-text-muted">
                         {comment.length}/1000
                     </span>
-                </label>
+                </div>
 
                 {error && (
-                    <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>
+                    <p className="mt-3 rounded-xl border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-400">{error}</p>
                 )}
 
                 <div className="mt-6 flex justify-end gap-3">
@@ -101,14 +116,14 @@ function ReviewModal({ jobId, onClose, onSuccess }) {
                         type="button"
                         disabled={submitting}
                         onClick={onClose}
-                        className="rounded-xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+                        className="rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-text-muted transition-all duration-200 hover:border-primary/30 hover:text-text-main disabled:opacity-60"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-[#07130c] transition-all duration-200 hover:bg-primary-hover hover:shadow-[0_0_16px_rgba(0,192,88,0.35)] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {submitting ? "Submitting..." : "Submit Review"}
                     </button>

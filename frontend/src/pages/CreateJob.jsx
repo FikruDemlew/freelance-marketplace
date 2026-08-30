@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import api from "../api/axios";
 import Navbar from "../components/Navbar";
@@ -50,27 +50,34 @@ function CreateJob() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background">
 
             {/* Navbar */}
             <Navbar />
 
             {/* Page Header */}
-            <section className="bg-black text-white">
+            <section className="border-b border-border bg-ink text-white">
 
-                <div className="mx-auto max-w-[1400px] px-6 py-16 lg:px-10">
+                <div className="mx-auto max-w-[1400px] px-6 py-14 lg:px-10">
 
-                    <div className="max-w-3xl">
+                    <Link
+                        to="/jobs"
+                        className="inline-flex items-center text-xs font-semibold text-text-muted transition-colors hover:text-primary"
+                    >
+                        ← Back to Jobs
+                    </Link>
 
-                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-400">
+                    <div className="mt-6 max-w-3xl">
+
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
                             For Clients
                         </p>
 
-                        <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+                        <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
                             Post a new job
                         </h1>
 
-                        <p className="mt-5 max-w-2xl text-base leading-7 text-gray-400 sm:text-lg">
+                        <p className="mt-4 max-w-2xl text-base leading-7 text-text-muted">
                             Tell talented freelancers what you need and
                             find the right person for your project.
                         </p>
@@ -83,18 +90,18 @@ function CreateJob() {
 
 
             {/* Form Area */}
-            <main className="mx-auto max-w-[1100px] px-6 py-12 lg:px-10 lg:py-16">
+            <main className="mx-auto max-w-[1000px] px-6 py-12 lg:px-10 lg:py-16">
 
-                <div className="rounded-[28px] border border-gray-200 bg-white p-6 shadow-sm sm:p-10">
+                <div className="rounded-3xl border border-border bg-surface p-6 shadow-xl sm:p-10">
 
                     {/* Form Header */}
-                    <div className="mb-10 border-b border-gray-100 pb-8">
+                    <div className="mb-10 border-b border-border pb-8">
 
-                        <h2 className="text-2xl font-bold tracking-tight text-gray-950">
+                        <h2 className="font-display text-2xl font-bold tracking-tight text-text-main">
                             Job information
                         </h2>
 
-                        <p className="mt-2 text-sm text-gray-500">
+                        <p className="mt-2 text-sm text-text-muted">
                             Provide enough details so freelancers can
                             understand your project clearly.
                         </p>
@@ -104,9 +111,9 @@ function CreateJob() {
 
                     {/* Error */}
                     {error && (
-                        <div className="mb-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
+                        <div className="mb-8 rounded-xl border border-red-500/25 bg-red-500/10 px-5 py-4">
 
-                            <p className="text-sm font-medium text-red-700">
+                            <p className="text-sm font-medium text-red-400">
                                 {typeof error === "string"
                                     ? error
                                     : JSON.stringify(error)}
@@ -123,7 +130,7 @@ function CreateJob() {
 
                             <label
                                 htmlFor="title"
-                                className="mb-2 block text-sm font-semibold text-gray-900"
+                                className="mb-2 block text-sm font-semibold text-text-main"
                             >
                                 Job Title
                             </label>
@@ -136,10 +143,10 @@ function CreateJob() {
                                 onChange={handleChange}
                                 placeholder="e.g. Build a React website"
                                 required
-                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                className="field"
                             />
 
-                            <p className="mt-2 text-xs text-gray-400">
+                            <p className="mt-2 text-xs text-text-subtle">
                                 Give your project a clear and specific title.
                             </p>
 
@@ -151,7 +158,7 @@ function CreateJob() {
 
                             <label
                                 htmlFor="description"
-                                className="mb-2 block text-sm font-semibold text-gray-900"
+                                className="mb-2 block text-sm font-semibold text-text-main"
                             >
                                 Project Description
                             </label>
@@ -164,10 +171,10 @@ function CreateJob() {
                                 placeholder="Describe what you need, the goals of the project, required skills, and any important details..."
                                 required
                                 rows={7}
-                                className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm leading-6 text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                className="field resize-none leading-6"
                             />
 
-                            <p className="mt-2 text-xs text-gray-400">
+                            <p className="mt-2 text-xs text-text-subtle">
                                 Be as detailed as possible to attract the
                                 right freelancers.
                             </p>
@@ -180,7 +187,7 @@ function CreateJob() {
 
                             <label
                                 htmlFor="category"
-                                className="mb-2 block text-sm font-semibold text-gray-900"
+                                className="mb-2 block text-sm font-semibold text-text-main"
                             >
                                 Category
                             </label>
@@ -190,7 +197,7 @@ function CreateJob() {
                                 name="category"
                                 value={formData.category}
                                 onChange={handleChange}
-                                className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                className="field"
                             >
 
                                 <option value="Web Development">
@@ -217,27 +224,22 @@ function CreateJob() {
                                     Data Science
                                 </option>
 
-                                
                                 <option value="Sales & Lead Generation">
                                     Sales & Lead Generation
                                 </option>
-                                
+
                                 <option value="Data & Analytics">
                                     Data & Analytics
                                 </option>
-                                
-                                <option value="Data Science">
-                                    Data Science
-                                </option>
-                                
+
                                 <option value="Engineering & Architecture">
                                     Engineering & Architecture
                                 </option>
-                                
+
                                 <option value="Business Consulting & Strategy">
                                     Business Consulting & Strategy
                                 </option>
-                                
+
                                 <option value="Other">
                                     Other
                                 </option>
@@ -255,14 +257,14 @@ function CreateJob() {
 
                                 <label
                                     htmlFor="budget"
-                                    className="mb-2 block text-sm font-semibold text-gray-900"
+                                    className="mb-2 block text-sm font-semibold text-text-main"
                                 >
-                                    Budget
+                                    Budget <span className="font-normal text-text-muted">(USD)</span>
                                 </label>
 
                                 <div className="relative">
 
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-text-muted">
                                         $
                                     </span>
 
@@ -276,7 +278,7 @@ function CreateJob() {
                                         min="0"
                                         step="0.01"
                                         required
-                                        className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-9 pr-4 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                        className="field pl-9"
                                     />
 
                                 </div>
@@ -289,7 +291,7 @@ function CreateJob() {
 
                                 <label
                                     htmlFor="deadline"
-                                    className="mb-2 block text-sm font-semibold text-gray-900"
+                                    className="mb-2 block text-sm font-semibold text-text-main"
                                 >
                                     Deadline
                                 </label>
@@ -301,7 +303,7 @@ function CreateJob() {
                                     value={formData.deadline}
                                     onChange={handleChange}
                                     required
-                                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900 outline-none transition focus:border-gray-950 focus:bg-white focus:ring-2 focus:ring-gray-950/10"
+                                    className="field"
                                 />
 
                             </div>
@@ -310,12 +312,12 @@ function CreateJob() {
 
 
                         {/* Actions */}
-                        <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-8 sm:flex-row sm:justify-end">
+                        <div className="flex flex-col-reverse gap-3 border-t border-border pt-8 sm:flex-row sm:justify-end">
 
                             <button
                                 type="button"
                                 onClick={() => navigate("/jobs")}
-                                className="rounded-xl border border-gray-200 px-6 py-3.5 text-sm font-semibold text-gray-700 transition hover:border-gray-400 hover:bg-gray-50"
+                                className="rounded-xl border border-border px-6 py-3 text-sm font-semibold text-text-muted transition-all duration-200 hover:border-primary/30 hover:text-text-main"
                             >
                                 Cancel
                             </button>
@@ -323,7 +325,7 @@ function CreateJob() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="rounded-xl bg-black px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-xl bg-primary px-7 py-3 text-sm font-bold text-[#07130c] transition-all duration-200 hover:bg-primary-hover hover:shadow-[0_0_16px_rgba(0,192,88,0.35)] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {loading
                                     ? "Creating..."
