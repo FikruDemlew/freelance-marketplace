@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import api from "../api/axios";
@@ -15,7 +15,7 @@ function MyJobs() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const fetchJobs = async () => {
+    const fetchJobs = useCallback(async () => {
         try {
             const response = await api.get("/jobs/my-jobs/");
             setJobs(response.data);
@@ -25,11 +25,12 @@ function MyJobs() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        fetchJobs();
-    }, []);
+        const timer = setTimeout(fetchJobs, 0);
+        return () => clearTimeout(timer);
+    }, [fetchJobs]);
 
     const handleDelete = async (jobId) => {
         if (!window.confirm("Are you sure you want to delete this job?")) return;
@@ -89,7 +90,7 @@ function MyJobs() {
                 )}
 
                 {/* Empty state */}
-                {jobs.length === 0 ? (
+                {error ? null : jobs.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-surface px-6 py-24 text-center">
                         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-surface-hover text-2xl">
                             📋

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/useAuth";
@@ -38,7 +38,28 @@ function MyProfile() {
     const [selectedImageFile, setSelectedImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
-    const fetchProfileData = async () => {
+    const populateFormData = (data) => {
+        setFormData({
+            first_name: data.first_name || "",
+            last_name: data.last_name || "",
+            email: data.email || "",
+            phone: data.phone || "",
+            bio: data.bio || "",
+            location: data.location || "",
+            hourly_rate: data.hourly_rate ?? "",
+            skillsInput: Array.isArray(data.skills) ? data.skills.join(", ") : "",
+            experience: data.experience || "",
+            portfolio_url: data.portfolio_url || "",
+            github_url: data.github_url || "",
+            linkedin_url: data.linkedin_url || "",
+            company_name: data.company_name || "",
+            website: data.website || "",
+        });
+        setImagePreview(data.profile_image || null);
+        setSelectedImageFile(null);
+    };
+
+    const fetchProfileData = useCallback(async () => {
         setLoading(true);
         setError("");
         try {
@@ -64,32 +85,12 @@ function MyProfile() {
         } finally {
             setLoading(false);
         }
-    };
-
-    useEffect(() => {
-        fetchProfileData();
     }, []);
 
-    const populateFormData = (data) => {
-        setFormData({
-            first_name: data.first_name || "",
-            last_name: data.last_name || "",
-            email: data.email || "",
-            phone: data.phone || "",
-            bio: data.bio || "",
-            location: data.location || "",
-            hourly_rate: data.hourly_rate ?? "",
-            skillsInput: Array.isArray(data.skills) ? data.skills.join(", ") : "",
-            experience: data.experience || "",
-            portfolio_url: data.portfolio_url || "",
-            github_url: data.github_url || "",
-            linkedin_url: data.linkedin_url || "",
-            company_name: data.company_name || "",
-            website: data.website || "",
-        });
-        setImagePreview(data.profile_image || null);
-        setSelectedImageFile(null);
-    };
+    useEffect(() => {
+        const timer = setTimeout(fetchProfileData, 0);
+        return () => clearTimeout(timer);
+    }, [fetchProfileData]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;

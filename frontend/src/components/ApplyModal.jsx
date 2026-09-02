@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     createApplication,
     updateApplication,
@@ -17,7 +17,7 @@ function ApplyModal({
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
+    const syncForm = useCallback(() => {
         if (existingApplication) {
             setProposal(existingApplication.proposal || "");
             setBidAmount(existingApplication.bid_amount || "");
@@ -26,6 +26,11 @@ function ApplyModal({
             setBidAmount("");
         }
     }, [existingApplication]);
+
+    useEffect(() => {
+        const timer = setTimeout(syncForm, 0);
+        return () => clearTimeout(timer);
+    }, [syncForm]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();

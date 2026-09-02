@@ -4,6 +4,8 @@ from .views import (
     JobListCreateAPIView,
     MyJobsListAPIView,
     JobDetailAPIView,
+    SavedJobListAPIView,
+    SaveJobAPIView,
 )
 
 
@@ -13,6 +15,18 @@ urlpatterns = [
         "my-jobs/",
         MyJobsListAPIView.as_view(),
         name="my-jobs",
+    ),
+
+    path(
+        "saved/",
+        SavedJobListAPIView.as_view(),
+        name="saved-jobs-list",
+    ),
+
+    path(
+        "<int:job_id>/save/",
+        SaveJobAPIView.as_view(),
+        name="job-save",
     ),
 
     path(

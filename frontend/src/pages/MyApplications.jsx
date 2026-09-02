@@ -30,7 +30,7 @@ function MyApplications() {
             );
         } catch (error) {
             console.error(error);
-            setError(error.response?.data || "Failed to delete application.");
+            setError(error.response?.data?.detail || "Failed to delete application.");
         }
     };
 
@@ -100,7 +100,7 @@ function MyApplications() {
                     </div>
                 )}
 
-                {applications.length === 0 ? (
+                {error ? null : applications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-surface px-6 py-24 text-center">
                         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-surface-hover text-2xl">
                             📄

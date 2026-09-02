@@ -6,38 +6,10 @@ import Navbar from "../components/Navbar";
 import HowItWorks from "../components/HowItWorks";
 import CTA from "../components/CTA";
 import Footer from "../components/Footer";
-import { useNavigate } from "react-router-dom";
-
-/* ── Small badge helper ─────────────────────────────────────────── */
-function StatusBadge({ status }) {
-    const map = {
-        Open:        "badge-open",
-        Closed:      "badge-closed",
-        "In Progress": "badge-in-progress",
-        Completed:   "badge-completed",
-    };
-    return (
-        <span className={`inline-flex h-6 items-center rounded-full px-3 text-[10px] font-bold uppercase tracking-wide ${map[status] ?? "badge-open"}`}>
-            {status}
-        </span>
-    );
-}
-
-/* ── Category colour map ────────────────────────────────────────── */
-const categoryColors = {
-    "Web Development":   "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20",
-    "Mobile Development":"bg-violet-500/10 text-violet-400 ring-1 ring-violet-500/20",
-    "UI/UX Design":      "bg-pink-500/10 text-pink-400 ring-1 ring-pink-500/20",
-    "Graphics Design":   "bg-orange-500/10 text-orange-400 ring-1 ring-orange-500/20",
-    "Writing":           "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20",
-    "Data Science":      "bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/20",
-    "Data & Analytics":  "bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/20",
-    "Other":             "bg-gray-500/10 text-gray-400 ring-1 ring-gray-500/20",
-};
-const defaultCategoryColor = "bg-primary/10 text-primary ring-1 ring-primary/20";
+import JobCard from "../components/JobCard";
+import { useSavedJobs } from "../hooks/useSavedJobs";
 
 function Jobs() {
-    const navigate = useNavigate();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -46,25 +18,49 @@ function Jobs() {
     const [minBudget, setMinBudget] = useState("");
     const [maxBudget, setMaxBudget] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("");
-    const [sortBy, setSortBy] = useState("newest");
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState({
+        count: 0,
+        next: null,
+        previous: null,
+    });
 
     const { user, loading: authLoading } = useAuth();
+    const { isJobSaved, isJobPending, toggleSavedJob } = useSavedJobs(user, authLoading);
 
     useEffect(() => {
         const fetchJobs = async () => {
+            setLoading(true);
+            setError(null);
+
+            const params = { page };
+            if (searchTerm.trim()) params.search = searchTerm.trim();
+            if (selectedCategory) params.category = selectedCategory;
+            if (minBudget) params.min_budget = minBudget;
+            if (maxBudget) params.max_budget = maxBudget;
+            if (selectedStatus) params.status = selectedStatus;
+
             try {
-                const response = await api.get("/jobs/");
-                setJobs(response.data);
-            } catch {
+                const response = await api.get("/jobs/", { params });
+                const data = response.data;
+                setJobs(Array.isArray(data) ? data : data.results || []);
+                setPagination({
+                    count: Array.isArray(data) ? data.length : data.count || 0,
+                    next: Array.isArray(data) ? null : data.next,
+                    previous: Array.isArray(data) ? null : data.previous,
+                });
+            } catch (requestError) {
+                console.error(requestError);
+                setJobs([]);
+                setPagination({ count: 0, next: null, previous: null });
                 setError("Failed to load jobs.");
-                navigate("/login");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchJobs();
-    }, []);
+    }, [searchTerm, selectedCategory, minBudget, maxBudget, selectedStatus, page]);
 
     /* ── Loading ───────────────────────────────────────────────── */
     if (loading) {
@@ -87,32 +83,7 @@ function Jobs() {
         );
     }
 
-    /* ── Filter + Sort ─────────────────────────────────────────── */
-    const filteredJobs = jobs
-        .filter((job) => {
-            const search = searchTerm.toLowerCase().trim();
-            const matchesSearch =
-                job.title.toLowerCase().includes(search) ||
-                job.description.toLowerCase().includes(search) ||
-                job.category.toLowerCase().includes(search);
-            const matchesCategory =
-                selectedCategory === "" ||
-                job.category.toLowerCase() === selectedCategory.toLowerCase();
-            const matchesMinBudget =
-                minBudget === "" || Number(job.budget) >= Number(minBudget);
-            const matchesMaxBudget =
-                maxBudget === "" || Number(job.budget) <= Number(maxBudget);
-            const matchesStatus =
-                selectedStatus === "" ||
-                job.status.toLowerCase() === selectedStatus.toLowerCase();
-            return matchesSearch && matchesCategory && matchesMinBudget && matchesMaxBudget && matchesStatus;
-        })
-        .sort((a, b) => {
-            if (sortBy === "budget-low") return Number(a.budget) - Number(b.budget);
-            if (sortBy === "budget-high") return Number(b.budget) - Number(a.budget);
-            if (sortBy === "deadline") return new Date(a.deadline) - new Date(b.deadline);
-            return new Date(b.created_at) - new Date(a.created_at);
-        });
+    const filteredJobs = jobs;
 
     const clearFilters = () => {
         setSearchTerm("");
@@ -120,7 +91,7 @@ function Jobs() {
         setMinBudget("");
         setMaxBudget("");
         setSelectedStatus("");
-        setSortBy("newest");
+        setPage(1);
     };
 
     return (
@@ -153,7 +124,10 @@ function Jobs() {
                         <div className="mt-7 flex max-w-2xl flex-col overflow-hidden rounded-xl border border-border bg-background sm:flex-row">
                             <input
                                 value={searchTerm}
-                                onChange={(event) => setSearchTerm(event.target.value)}
+                                onChange={(event) => {
+                                    setSearchTerm(event.target.value);
+                                    setPage(1);
+                                }}
                                 placeholder="Search for projects, skills, or categories…"
                                 className="min-w-0 flex-1 bg-transparent px-5 py-4 text-sm text-text-main outline-none placeholder:text-text-muted"
                             />
@@ -173,7 +147,10 @@ function Jobs() {
                                     <button
                                         key={category}
                                         type="button"
-                                        onClick={() => setSelectedCategory(category === "All" ? "" : category)}
+                                        onClick={() => {
+                                            setSelectedCategory(category === "All" ? "" : category);
+                                            setPage(1);
+                                        }}
                                         className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
                                             active
                                                 ? "border-primary/50 bg-primary/12 text-primary shadow-[0_0_8px_rgba(0,192,88,0.18)]"
@@ -245,7 +222,7 @@ function Jobs() {
                             </div>
                             <div className="grid grid-cols-2 divide-x divide-border border-t border-border">
                                 <div className="p-4">
-                                    <p className="text-xl font-bold text-primary">{filteredJobs.length}</p>
+                                    <p className="text-xl font-bold text-primary">{pagination.count}</p>
                                     <p className="mt-0.5 text-xs text-text-muted">Open projects</p>
                                 </div>
                                 <div className="p-4">
@@ -288,7 +265,10 @@ function Jobs() {
                                         type="number"
                                         min="0"
                                         value={minBudget}
-                                        onChange={(e) => setMinBudget(e.target.value)}
+                                        onChange={(e) => {
+                                            setMinBudget(e.target.value);
+                                            setPage(1);
+                                        }}
                                         placeholder="e.g. 100"
                                         className="field"
                                     />
@@ -303,7 +283,10 @@ function Jobs() {
                                         type="number"
                                         min="0"
                                         value={maxBudget}
-                                        onChange={(e) => setMaxBudget(e.target.value)}
+                                        onChange={(e) => {
+                                            setMaxBudget(e.target.value);
+                                            setPage(1);
+                                        }}
                                         placeholder="e.g. 1000"
                                         className="field"
                                     />
@@ -316,31 +299,17 @@ function Jobs() {
                                     </label>
                                     <select
                                         value={selectedStatus}
-                                        onChange={(e) => setSelectedStatus(e.target.value)}
+                                        onChange={(e) => {
+                                            setSelectedStatus(e.target.value);
+                                            setPage(1);
+                                        }}
                                         className="field"
                                     >
                                         <option value="">All Statuses</option>
                                         <option value="Open">Open</option>
-                                        <option value="Closed">Closed</option>
                                     </select>
                                 </div>
 
-                                {/* Sort */}
-                                <div>
-                                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-muted">
-                                        Sort By
-                                    </label>
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value)}
-                                        className="field"
-                                    >
-                                        <option value="newest">Newest</option>
-                                        <option value="budget-low">Budget: Low to High</option>
-                                        <option value="budget-high">Budget: High to Low</option>
-                                        <option value="deadline">Deadline: Soonest</option>
-                                    </select>
-                                </div>
                             </div>
                         </div>
 
@@ -366,7 +335,7 @@ function Jobs() {
                                 <h2 className="mt-1 font-display text-2xl font-bold text-text-main">Recent projects</h2>
                             </div>
                             <span className="rounded-full border border-border bg-surface px-4 py-1.5 text-sm font-semibold text-text-muted">
-                                {filteredJobs.length} {filteredJobs.length === 1 ? "job" : "jobs"}
+                                {pagination.count} {pagination.count === 1 ? "job" : "jobs"}
                             </span>
                         </div>
 
@@ -391,96 +360,41 @@ function Jobs() {
                         ) : (
 
                             /* ── JOB CARDS ─────────────────────────────── */
-                            <div className="space-y-4">
-                                {filteredJobs.map((job) => (
-                                    <article
-                                        key={job.id}
-                                        className="group relative overflow-hidden rounded-2xl border border-border bg-surface transition-all duration-300 hover:border-primary/35 hover:shadow-[0_4px_24px_rgba(0,192,88,0.08)] hover:-translate-y-0.5"
-                                    >
-                                        {/* Subtle glow top-right on hover */}
-                                        <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary/6 blur-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                            <div>
+                                <div className="space-y-4">
+                                    {filteredJobs.map((job) => (
+                                        <JobCard
+                                            key={job.id}
+                                            job={job}
+                                            user={user}
+                                            isSaved={isJobSaved(job.id)}
+                                            isPending={isJobPending(job.id)}
+                                            onToggleSaved={toggleSavedJob}
+                                        />
+                                    ))}
+                                </div>
 
-                                        <div className="grid lg:grid-cols-[1fr_220px]">
-
-                                            {/* LEFT — content */}
-                                            <div className="p-6 sm:p-7">
-
-                                                {/* Top row: category + save */}
-                                                <div className="flex items-center justify-between">
-                                                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${categoryColors[job.category] ?? defaultCategoryColor}`}>
-                                                        {job.category}
-                                                    </span>
-
-                                                    <div className="flex items-center gap-2">
-                                                        <StatusBadge status={job.status} />
-                                                        <button
-                                                            type="button"
-                                                            className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-text-muted transition-all duration-200 hover:border-primary/40 hover:text-primary"
-                                                            aria-label="Save job"
-                                                        >
-                                                            ♡
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                {/* Title */}
-                                                <h3 className="job-card-title mt-4 text-xl font-bold leading-tight tracking-tight sm:text-2xl">
-                                                    {job.title}
-                                                </h3>
-
-                                                {/* Description */}
-                                                <p className="job-card-copy mt-2.5 line-clamp-2 text-sm leading-6">
-                                                    {job.description}
-                                                </p>
-
-                                                {/* Meta chips */}
-                                                <div className="mt-4 flex flex-wrap items-center gap-3">
-                                                    <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
-                                                        <span className="text-primary">💰</span>
-                                                        <span className="font-semibold text-text-main">${job.budget}</span>
-                                                        budget
-                                                    </span>
-                                                    <span className="h-3 w-px bg-border" />
-                                                    <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
-                                                        <span>📅</span>
-                                                        Due <span className="font-medium text-text-main">{job.deadline}</span>
-                                                    </span>
-                                                </div>
-
-                                            </div>
-
-                                            {/* RIGHT — action panel */}
-                                            <div className="flex flex-col justify-between border-t border-border bg-background/35 p-5 sm:p-6 lg:border-l lg:border-t-0">
-
-                                                {/* Budget highlight */}
-                                                <div>
-                                                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">Budget</p>
-                                                    <p className="mt-1.5 font-display text-3xl font-bold text-text-main">
-                                                        ${job.budget}
-                                                    </p>
-                                                    <p className="mt-0.5 text-xs text-text-muted">Fixed price</p>
-                                                </div>
-
-                                                {/* Deadline */}
-                                                <div className="mt-4">
-                                                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">Deadline</p>
-                                                    <p className="mt-1 text-sm font-semibold text-text-main">{job.deadline}</p>
-                                                </div>
-
-                                                {/* CTA */}
-                                                <Link
-                                                    to={`/jobs/${job.id}`}
-                                                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-[#07130c] transition-all duration-200 hover:bg-primary-hover hover:shadow-[0_0_16px_rgba(0,192,88,0.3)]"
-                                                >
-                                                    View Job
-                                                    <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                                                </Link>
-
-                                            </div>
-
-                                        </div>
-                                    </article>
-                                ))}
+                                {(pagination.previous || pagination.next) && (
+                                    <div className="mt-8 flex items-center justify-between rounded-2xl border border-border bg-surface p-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setPage((current) => Math.max(1, current - 1))}
+                                            disabled={!pagination.previous || loading}
+                                            className="rounded-xl border border-border bg-surface-hover px-4 py-2 text-sm font-semibold text-text-main transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                            Previous
+                                        </button>
+                                        <span className="text-xs font-semibold text-text-muted">Page {page}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPage((current) => current + 1)}
+                                            disabled={!pagination.next || loading}
+                                            className="rounded-xl border border-border bg-surface-hover px-4 py-2 text-sm font-semibold text-text-main transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                )}
                             </div>
 
                         )}

@@ -131,9 +131,9 @@ function Login() {
                                 <label htmlFor="password" className="text-sm font-semibold text-text-main">
                                     Password
                                 </label>
-                                <Link to="/forgot-password" className="text-xs font-medium text-primary transition-colors hover:text-primary-hover">
-                                    Forgot password?
-                                </Link>
+                                <span className="text-xs font-medium text-text-muted">
+                                    Password reset unavailable
+                                </span>
                             </div>
                             <input
                                 id="password"

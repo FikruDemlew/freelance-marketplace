@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/useAuth";
@@ -26,7 +26,7 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         if (!user) return;
         setLoading(true);
         setError("");
@@ -48,11 +48,12 @@ function Dashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
 
     useEffect(() => {
-        fetchDashboardData();
-    }, [user]);
+        const timer = setTimeout(fetchDashboardData, 0);
+        return () => clearTimeout(timer);
+    }, [fetchDashboardData]);
 
     if (loading) {
         return (

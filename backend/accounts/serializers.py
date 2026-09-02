@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from django.db.models import Avg
 from drf_spectacular.utils import extend_schema_field
 from .models import Profile
@@ -53,6 +54,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
         return user
+
+    def validate_password(self, value):
+        validate_password(value)
+        return value
 
 
 class ProfileBaseSerializer(serializers.ModelSerializer):

@@ -10,6 +10,7 @@ from .serializers import (
     CurrentProfileSerializer,
     PublicProfileSerializer,
 )
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -22,6 +23,7 @@ class RegisterAPIView(APIView):
         summary="Register a new user",
         description="Create a new user account with a client or freelancer role.",
         request=RegisterSerializer,
+        responses={201: OpenApiTypes.OBJECT, 400: OpenApiTypes.OBJECT},
     )
 
     def post(self, request):
@@ -51,7 +53,8 @@ class RegisterAPIView(APIView):
 class LoginAPIView(APIView):
 
     @extend_schema(
-        request=LoginSerializer
+        request=LoginSerializer,
+        responses={200: OpenApiTypes.OBJECT, 401: OpenApiTypes.OBJECT},
     )
     
     def post(self, request):
@@ -96,6 +99,8 @@ class LoginAPIView(APIView):
         
 class MeAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(responses={200: OpenApiTypes.OBJECT})
     def get(self, request):
     
         try:

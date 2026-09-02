@@ -23,13 +23,14 @@ class ApplicationListCreateAPIView(
     def get_queryset(self):
 
         user = self.request.user
+        profile = getattr(user, "profile", None)
 
-        if user.profile.role == "freelancer":
+        if profile and profile.role == "freelancer":
             return Application.objects.filter(
                 freelancer=user
             )
 
-        if user.profile.role == "client":
+        if profile and profile.role == "client":
             return Application.objects.filter(
                 job__client=user
             )
@@ -38,7 +39,8 @@ class ApplicationListCreateAPIView(
 
     def perform_create(self, serializer):
 
-        if self.request.user.profile.role != "freelancer":
+        profile = getattr(self.request.user, "profile", None)
+        if not profile or profile.role != "freelancer":
             raise PermissionDenied(
                 "Only freelancers can apply for jobs."
             )
@@ -77,6 +79,10 @@ class ApplicationDetailAPIView(
         )
 
         if serializer.validated_data.get("status") == "Accepted":
+            if job.status != "Open":
+                raise PermissionDenied(
+                    "Only applications for open jobs can be accepted."
+                )
             already_accepted = Application.objects.filter(
                 job=job,
                 status="Accepted",
@@ -130,3 +136,10 @@ class ApplicationDetailAPIView(
                 notification_type="rejected",
                 message=f"Your application for '{job.title}' was rejected.",
             )
+
+    def perform_destroy(self, instance):
+        if instance.status == "Accepted":
+            raise PermissionDenied(
+                "Accepted applications cannot be deleted."
+            )
+        instance.delete()

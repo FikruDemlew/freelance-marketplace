@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import Navbar from "../components/Navbar";
 import {
@@ -11,6 +11,7 @@ import {
 
 function Messages() {
     const { user } = useAuth();
+    const { conversationId } = useParams();
     const [searchParams] = useSearchParams();
 
     const applicationId = searchParams.get("application");
@@ -64,8 +65,17 @@ function Messages() {
             setLoading(true);
             const data = await loadConversations();
 
-            // If we came from an application
-            if (applicationId) {
+            if (conversationId) {
+                const conversation = data.find(
+                    (item) => Number(item.id) === Number(conversationId)
+                );
+
+                if (conversation) {
+                    await openConversation(conversation);
+                } else {
+                    setError("Conversation not found.");
+                }
+            } else if (applicationId) {
                 const existingConversation = data.find(
                     (conversation) =>
                         Number(conversation.application) ===
@@ -100,7 +110,7 @@ function Messages() {
         };
 
         initializeMessages();
-    }, [user, applicationId]);
+    }, [user, applicationId, conversationId]);
 
     // Send message
     const handleSendMessage = async (event) => {

@@ -237,6 +237,14 @@ function Navbar({ landing = false }) {
                                             👤 My Profile
                                         </Link>
 
+                                        <Link
+                                            to="/saved-jobs"
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                            className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-text-main hover:bg-surface-hover hover:text-primary transition-colors"
+                                        >
+                                            ♥ Saved Jobs
+                                        </Link>
+
                                         {user.role === "client" ? (
                                             <Link
                                                 to="/my-jobs"

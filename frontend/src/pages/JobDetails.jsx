@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import api from "../api/axios";
@@ -14,11 +14,17 @@ import {
     createConversation,
 } from "../services/chat";
 import { getReviews } from "../services/review";
+import { useSavedJobs } from "../hooks/useSavedJobs";
 
 function JobDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
+    const {
+        isJobSaved,
+        isJobPending,
+        toggleSavedJob,
+    } = useSavedJobs(user, authLoading);
 
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -82,7 +88,7 @@ function JobDetails() {
         fetchJob();
     }, [id]);
 
-    const fetchJobReview = async () => {
+    const fetchJobReview = useCallback(async () => {
         if (!job) return;
 
         setReviewLoading(true);
@@ -95,10 +101,10 @@ function JobDetails() {
         } finally {
             setReviewLoading(false);
         }
-    };
+    }, [job]);
 
     // 2. Fetch Application Status (Only runs AFTER job is loaded)
-    const fetchUserApplications = async () => {
+    const fetchUserApplications = useCallback(async () => {
         if (!user || user.role !== "freelancer" || !job) {
             setExistingApplication(null);
             return;
@@ -118,9 +124,9 @@ function JobDetails() {
             console.error("Failed to check application status:", error);
             setExistingApplication(null);
         }
-    };
+    }, [job, user]);
 
-    const fetchJobApplications = async () => {
+    const fetchJobApplications = useCallback(async () => {
         if (!user || user.role !== "client" || !job) {
             setJobApplications([]);
             return;
@@ -142,7 +148,7 @@ function JobDetails() {
         } finally {
             setApplicationsLoading(false);
         }
-    };
+    }, [job, user]);
 
     const handleApplicationStatus = async (applicationId, status) => {
         setStatusUpdating(applicationId);
@@ -188,22 +194,22 @@ function JobDetails() {
     };
 
     useEffect(() => {
-        if (job && user?.role === "client") {
-            fetchJobApplications();
-        }
-    }, [job, user]);
+        if (!job || user?.role !== "client") return undefined;
+        const timer = setTimeout(fetchJobApplications, 0);
+        return () => clearTimeout(timer);
+    }, [job, user, fetchJobApplications]);
 
     useEffect(() => {
-        if (job) {
-            fetchJobReview();
-        }
-    }, [job]);
+        if (!job) return undefined;
+        const timer = setTimeout(fetchJobReview, 0);
+        return () => clearTimeout(timer);
+    }, [job, fetchJobReview]);
 
     useEffect(() => {
-        if (job) {
-            fetchUserApplications();
-        }
-    }, [job, user]);
+        if (!job) return undefined;
+        const timer = setTimeout(fetchUserApplications, 0);
+        return () => clearTimeout(timer);
+    }, [job, user, fetchUserApplications]);
 
     const handleDelete = async () => {
         const confirmed = window.confirm(
@@ -217,7 +223,7 @@ function JobDetails() {
             navigate("/jobs");
         } catch (error) {
             console.error(error);
-            setError(error.response?.data || "Failed to delete job.");
+            setError(error.response?.data?.detail || "Failed to delete job.");
         }
     };
 
@@ -415,6 +421,20 @@ function JobDetails() {
                                 </p>
                             </div>
 
+                            {user && (
+                                <button
+                                    type="button"
+                                    onClick={() => toggleSavedJob(job.id)}
+                                    disabled={isJobPending(job.id)}
+                                    aria-label={isJobSaved(job.id) ? "Remove saved job" : "Save job"}
+                                    aria-pressed={isJobSaved(job.id)}
+                                    className={`flex w-full items-center justify-center gap-2 rounded-xl border px-5 py-3 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-60 ${isJobSaved(job.id) ? "border-primary/50 bg-primary/10 text-primary" : "border-border bg-surface-hover text-text-main hover:border-primary/30 hover:text-primary"}`}
+                                >
+                                    <span aria-hidden="true">{isJobSaved(job.id) ? "♥" : "♡"}</span>
+                                    {isJobSaved(job.id) ? "Saved Job" : "Save Job"}
+                                </button>
+                            )}
+
                             {/* Owner Actions */}
                             {isOwner && (
                                 <div className="mt-6 border-t border-border pt-6 space-y-3">
@@ -513,7 +533,7 @@ function JobDetails() {
                                                 </button>
                                             )}
                                         </div>
-                                    ) : (
+                                    ) : job.status === "Open" ? (
                                         <button
                                             type="button"
                                             onClick={() => setIsApplyModalOpen(true)}
@@ -521,6 +541,10 @@ function JobDetails() {
                                         >
                                             Apply for Job
                                         </button>
+                                    ) : (
+                                        <div className="rounded-xl border border-border bg-surface-hover px-4 py-3 text-center text-xs font-semibold text-text-muted">
+                                            Applications are closed for this job.
+                                        </div>
                                     )}
                                 </div>
                             )}

@@ -47,6 +47,11 @@ class ConversationListCreateAPIView(generics.ListCreateAPIView):
                 "You are not part of this application."
             )
 
+        if application.status != "Accepted":
+            raise PermissionDenied(
+                "Messaging is available only for accepted applications."
+            )
+
         # Make sure the conversation does not already exist.
         if Conversation.objects.filter(
             application=application
@@ -118,6 +123,7 @@ class MessageListCreateAPIView(generics.ListCreateAPIView):
             conversation=conversation,
             sender=user,
         )
+        conversation.save(update_fields=["updated_at"])
 
         recipient = (
             conversation.freelancer
