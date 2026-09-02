@@ -1,0 +1,52 @@
+databases:
+  - name: freelance-marketplace-db
+    plan: free
+
+services:
+  - type: web
+    name: freelance-marketplace-api
+    runtime: python
+    rootDir: backend
+    buildCommand: bash build.sh
+    startCommand: gunicorn config.wsgi:application --log-file -
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: DB_ENGINE
+        value: postgresql
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: freelance-marketplace-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: freelance-marketplace-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: freelance-marketplace-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: freelance-marketplace-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: freelance-marketplace-db
+          property: port
+      - key: SECURE_SSL_REDIRECT
+        value: "true"
+      - key: SECURE_HSTS_SECONDS
+        value: "31536000"
+      - key: SECURE_HSTS_INCLUDE_SUBDOMAINS
+        value: "true"
+      - key: SECURE_HSTS_PRELOAD
+        value: "true"
