@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from applications.models import Application
+from notifications.services import create_notification
 
 
 class ConversationListCreateAPIView(generics.ListCreateAPIView):
@@ -116,4 +117,16 @@ class MessageListCreateAPIView(generics.ListCreateAPIView):
         serializer.save(
             conversation=conversation,
             sender=user,
+        )
+
+        recipient = (
+            conversation.freelancer
+            if conversation.client_id == user.id
+            else conversation.client
+        )
+        create_notification(
+            recipient=recipient,
+            application=conversation.application,
+            notification_type="message",
+            message=f"{user.username} sent you a new message.",
         )

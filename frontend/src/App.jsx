@@ -10,6 +10,7 @@ import Landing from "./pages/Landing";
 import MyApplications from "./pages/MyApplications";
 import Messages from "./pages/Messages";
 import MyJobs from "./pages/MyJobs";
+import Notifications from "./pages/Notifications";
 
 function App() {
     return (
@@ -71,6 +72,24 @@ function App() {
             <Route
                 path="/chat/:conversationId"
                 element={<Messages />}
+            />
+
+            <Route
+                path="/messages"
+                element={
+                    <ProtectedRoute>
+                        <Messages />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/notifications"
+                element={
+                    <ProtectedRoute>
+                        <Notifications />
+                    </ProtectedRoute>
+                }
             />
 
             <Route
