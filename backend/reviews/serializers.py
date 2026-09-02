@@ -6,6 +6,7 @@ from .models import Review
 
 class ReviewSerializer(serializers.ModelSerializer):
     reviewer = serializers.ReadOnlyField(source="reviewer.username")
+    reviewer_id = serializers.ReadOnlyField(source="reviewer.id")
     freelancer = serializers.ReadOnlyField(source="freelancer.username")
     freelancer_id = serializers.ReadOnlyField(source="freelancer.id")
     job_title = serializers.ReadOnlyField(source="job.title")
@@ -17,6 +18,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             "job",
             "job_title",
             "reviewer",
+            "reviewer_id",
             "freelancer",
             "freelancer_id",
             "rating",
@@ -27,6 +29,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "reviewer",
+            "reviewer_id",
             "freelancer",
             "freelancer_id",
             "job_title",

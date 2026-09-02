@@ -4,11 +4,7 @@ from .models import Notification
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    application_id = serializers.IntegerField(
-        source="application_id",
-        read_only=True,
-        allow_null=True,
-    )
+    application_id = serializers.IntegerField(read_only=True, allow_null=True)
 
     class Meta:
         model = Notification

@@ -11,6 +11,9 @@ import MyApplications from "./pages/MyApplications";
 import Messages from "./pages/Messages";
 import MyJobs from "./pages/MyJobs";
 import Notifications from "./pages/Notifications";
+import MyProfile from "./pages/MyProfile";
+import PublicProfile from "./pages/PublicProfile";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
     return (
@@ -97,6 +100,29 @@ function App() {
                 element={
                     <ProtectedRoute allowedRole="client">
                         <MyJobs />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute>
+                        <MyProfile />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/profile/:userId"
+                element={<PublicProfile />}
+            />
+
+            <Route
+                path="/dashboard"
+                element={
+                    <ProtectedRoute>
+                        <Dashboard />
                     </ProtectedRoute>
                 }
             />

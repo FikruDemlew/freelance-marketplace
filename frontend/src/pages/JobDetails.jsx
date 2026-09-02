@@ -322,12 +322,24 @@ function JobDetails() {
 
                         <div className="mt-5 flex items-center gap-2 text-sm text-text-muted">
                             <span>Posted by</span>
-                            <span className="inline-flex items-center gap-1.5 font-semibold text-text-main">
-                                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
-                                    {jobClientUsername?.slice(0, 1).toUpperCase() || "C"}
+                            {job?.client_id ? (
+                                <Link
+                                    to={`/profile/${job.client_id}`}
+                                    className="inline-flex items-center gap-1.5 font-semibold text-text-main hover:text-primary transition-colors"
+                                >
+                                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                                        {jobClientUsername?.slice(0, 1).toUpperCase() || "C"}
+                                    </span>
+                                    {jobClientUsername}
+                                </Link>
+                            ) : (
+                                <span className="inline-flex items-center gap-1.5 font-semibold text-text-main">
+                                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                                        {jobClientUsername?.slice(0, 1).toUpperCase() || "C"}
+                                    </span>
+                                    {jobClientUsername}
                                 </span>
-                                {jobClientUsername}
-                            </span>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -562,24 +574,48 @@ function JobDetails() {
                                         className="rounded-2xl border border-border bg-surface p-6 shadow-sm"
                                     >
                                         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 font-bold text-primary ring-1 ring-primary/25">
-                                                    {application.freelancer?.slice(0, 1).toUpperCase() || "F"}
+                                            {application.freelancer_id ? (
+                                                <Link
+                                                    to={`/profile/${application.freelancer_id}`}
+                                                    className="flex items-center gap-3 group/freelancer hover:text-primary transition-colors"
+                                                >
+                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 font-bold text-primary ring-1 ring-primary/25 group-hover/freelancer:bg-primary/25">
+                                                        {application.freelancer?.slice(0, 1).toUpperCase() || "F"}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-display text-base font-bold text-text-main group-hover/freelancer:text-primary transition-colors">
+                                                            {application.freelancer}
+                                                        </h3>
+                                                        <p className="text-xs text-text-muted">
+                                                            Applied on{" "}
+                                                            {new Date(application.created_at).toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                                year: "numeric",
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                </Link>
+                                            ) : (
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 font-bold text-primary ring-1 ring-primary/25">
+                                                        {application.freelancer?.slice(0, 1).toUpperCase() || "F"}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-display text-base font-bold text-text-main">
+                                                            {application.freelancer}
+                                                        </h3>
+                                                        <p className="text-xs text-text-muted">
+                                                            Applied on{" "}
+                                                            {new Date(application.created_at).toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                                year: "numeric",
+                                                            })}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <h3 className="font-display text-base font-bold text-text-main">
-                                                        {application.freelancer}
-                                                    </h3>
-                                                    <p className="text-xs text-text-muted">
-                                                        Applied on{" "}
-                                                        {new Date(application.created_at).toLocaleDateString("en-US", {
-                                                            month: "short",
-                                                            day: "numeric",
-                                                            year: "numeric",
-                                                        })}
-                                                    </p>
-                                                </div>
-                                            </div>
+                                            )}
 
                                             <span className={`h-fit rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${
                                                 application.status === "Accepted" ? "badge-accepted" :

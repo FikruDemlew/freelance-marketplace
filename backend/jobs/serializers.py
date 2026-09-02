@@ -8,6 +8,8 @@ class JobSerializer(serializers.ModelSerializer):
         source="client.username"
     )
 
+    client_id = serializers.ReadOnlyField(source="client.id")
+
     applications_count = serializers.IntegerField(
         source="applications.count",
         read_only=True,
@@ -19,6 +21,7 @@ class JobSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "client",
+            "client_id",
             "title",
             "description",
             "category",

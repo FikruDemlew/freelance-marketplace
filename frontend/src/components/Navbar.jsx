@@ -8,11 +8,12 @@ import {
 } from "../services/notification";
 
 function Navbar({ landing = false }) {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
     const [notifications, setNotifications] = useState([]);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
     useEffect(() => {
         if (!user) {
@@ -101,6 +102,7 @@ function Navbar({ landing = false }) {
                     ) : (
                         <>
                             {navLink("/jobs", "Find Jobs")}
+                            {user && navLink("/dashboard", "Dashboard")}
                             <a href="#how-it-works" className="text-sm font-medium text-gray-400 transition-colors hover:text-white">
                                 How It Works
                             </a>
@@ -195,14 +197,78 @@ function Navbar({ landing = false }) {
                                 )}
                             </div>
 
-                            {/* Avatar + username */}
-                            <div className="hidden items-center gap-2 sm:flex">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary ring-1 ring-primary/30">
-                                    {user.username?.slice(0, 1).toUpperCase()}
-                                </span>
-                                <span className="text-sm font-medium text-gray-300">
-                                    {user.username}
-                                </span>
+                            {/* User Menu Dropdown */}
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsUserMenuOpen((open) => !open)}
+                                    aria-expanded={isUserMenuOpen}
+                                    className="flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-3 py-1.5 transition-all duration-200 hover:border-primary/50 hover:bg-primary/10"
+                                >
+                                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary ring-1 ring-primary/30">
+                                        {user.username?.slice(0, 1).toUpperCase()}
+                                    </span>
+                                    <span className="hidden text-xs font-semibold text-gray-300 sm:inline">
+                                        {user.username}
+                                    </span>
+                                    <span className="text-[10px] text-gray-400">▼</span>
+                                </button>
+
+                                {isUserMenuOpen && (
+                                    <div className="absolute right-0 top-11 z-50 w-48 overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-2xl py-1">
+                                        <div className="border-b border-border px-4 py-2.5">
+                                            <p className="text-xs font-bold text-text-main truncate">{user.username}</p>
+                                            <p className="text-[10px] uppercase font-semibold text-primary">{user.role}</p>
+                                        </div>
+
+                                        <Link
+                                            to="/dashboard"
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                            className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-text-main hover:bg-surface-hover hover:text-primary transition-colors"
+                                        >
+                                            📊 Dashboard
+                                        </Link>
+
+                                        <Link
+                                            to="/profile"
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                            className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-text-main hover:bg-surface-hover hover:text-primary transition-colors"
+                                        >
+                                            👤 My Profile
+                                        </Link>
+
+                                        {user.role === "client" ? (
+                                            <Link
+                                                to="/my-jobs"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                                className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-text-main hover:bg-surface-hover hover:text-primary transition-colors"
+                                            >
+                                                📋 My Jobs
+                                            </Link>
+                                        ) : (
+                                            <Link
+                                                to="/my-applications"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                                className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-text-main hover:bg-surface-hover hover:text-primary transition-colors"
+                                            >
+                                                📄 My Applications
+                                            </Link>
+                                        )}
+
+                                        <div className="border-t border-border mt-1 pt-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setIsUserMenuOpen(false);
+                                                    logout();
+                                                }}
+                                                className="flex w-full items-center gap-2 px-4 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                                            >
+                                                🚪 Log Out
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {user.role === "client" && (
