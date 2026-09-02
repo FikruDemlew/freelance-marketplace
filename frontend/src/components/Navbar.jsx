@@ -1,11 +1,54 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { useTheme } from "../context/useTheme";
+import {
+    getNotifications,
+    markNotificationRead,
+} from "../services/notification";
 
 function Navbar({ landing = false }) {
     const { user } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
+    const [notifications, setNotifications] = useState([]);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+    useEffect(() => {
+        if (!user) {
+            return;
+        }
+
+        const loadNotifications = async () => {
+            try {
+                setNotifications(await getNotifications());
+            } catch (error) {
+                console.error("Failed to load notifications:", error);
+            }
+        };
+
+        loadNotifications();
+    }, [user]);
+
+    const markAsRead = async (notificationId) => {
+        const notification = notifications.find(
+            (item) => item.id === notificationId
+        );
+        if (!notification || notification.is_read) return;
+
+        try {
+            const updatedNotification = await markNotificationRead(notificationId);
+            setNotifications((current) => current.map((item) => (
+                item.id === notificationId ? updatedNotification : item
+            )));
+        } catch (error) {
+            console.error("Failed to mark notification as read:", error);
+        }
+    };
+
+    const unreadCount = notifications.filter(
+        (notification) => !notification.is_read
+    ).length;
 
     const navLink = (to, label) => {
         const active = location.pathname === to;
@@ -82,6 +125,76 @@ function Navbar({ landing = false }) {
 
                     {user ? (
                         <div className="flex items-center gap-3">
+                            <Link
+                                to="/messages"
+                                aria-label="Messages"
+                                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-white/6 text-gray-400 transition-all duration-200 hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                            >
+                                <span aria-hidden="true">💬</span>
+                            </Link>
+
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsNotificationsOpen((open) => !open)}
+                                    aria-label="Notifications"
+                                    aria-expanded={isNotificationsOpen}
+                                    className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/12 bg-white/6 text-gray-400 transition-all duration-200 hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                                >
+                                    <span aria-hidden="true">🔔</span>
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-black text-[#07130c]">
+                                            {unreadCount > 9 ? "9+" : unreadCount}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {isNotificationsOpen && (
+                                    <div className="absolute right-0 top-11 z-50 w-80 overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-2xl">
+                                        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                                            <p className="font-display text-sm font-bold text-text-main">Notifications</p>
+                                            <Link
+                                                to="/notifications"
+                                                onClick={() => setIsNotificationsOpen(false)}
+                                                className="text-xs font-semibold text-primary hover:text-primary-hover"
+                                            >
+                                                View all
+                                            </Link>
+                                        </div>
+                                        {notifications.length === 0 ? (
+                                            <p className="px-4 py-7 text-center text-xs text-text-muted">
+                                                You&apos;re all caught up.
+                                            </p>
+                                        ) : (
+                                            <div className="max-h-80 overflow-y-auto">
+                                                {notifications.slice(0, 5).map((notification) => (
+                                                    <Link
+                                                        key={notification.id}
+                                                        to="/notifications"
+                                                        onClick={() => {
+                                                            markAsRead(notification.id);
+                                                            setIsNotificationsOpen(false);
+                                                        }}
+                                                        className={`block border-b border-border px-4 py-3 last:border-0 hover:bg-surface-hover ${
+                                                            notification.is_read ? "" : "bg-primary/5"
+                                                        }`}
+                                                    >
+                                                        <div className="flex gap-2">
+                                                            {!notification.is_read && (
+                                                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                                                            )}
+                                                            <p className="text-xs leading-5 text-text-main">
+                                                                {notification.message}
+                                                            </p>
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
                             {/* Avatar + username */}
                             <div className="hidden items-center gap-2 sm:flex">
                                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary ring-1 ring-primary/30">
