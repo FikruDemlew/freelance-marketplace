@@ -5,6 +5,7 @@ databases:
 services:
   - type: web
     name: freelance-marketplace-api
+    plan: free
     runtime: python
     rootDir: backend
     buildCommand: bash build.sh
