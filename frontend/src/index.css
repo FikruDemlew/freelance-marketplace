@@ -1,1 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --color-background: #121214;       /* Main dark background */
+  --color-surface: #1a1a22;          /* Card/Container background — slightly warmer */
+  --color-surface-hover: #24242f;    /* Hover surface */
+  --color-surface-elevated: #222230; /* Elevated card on top of surface */
+
+  /* Brand & Accent Colors */
+  --color-primary: #00c058;          /* Vibrant green */
+  --color-primary-hover: #00a84d;    /* Darker green hover */
+  --color-secondary: #8b5cf6;        /* Purple accent */
+
+  /* Text Colors */
+  --color-text-main: #f1f1f3;        /* High-contrast white text */
+  --color-text-muted: #9196a1;       /* Secondary grey text */
+  --color-text-subtle: #5c6370;      /* Very muted text */
+
+  /* Borders & Outlines */
+  --color-border: #2a2a36;
+  --color-border-subtle: #222230;
+  --color-ink: #0c0c0f;
+
+  --font-sans: "Manrope", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+}
+
+:root {
+  --color-background: #121214;
+  --color-surface: #1a1a22;
+  --color-surface-hover: #24242f;
+  --color-surface-elevated: #222230;
+  --color-text-main: #f1f1f3;
+  --color-text-muted: #9196a1;
+  --color-text-subtle: #5c6370;
+  --color-border: #2a2a36;
+  --color-border-subtle: #222230;
+  --color-ink: #0c0c0f;
+}
+
+body[data-theme="light"] {
+  --color-background: #f4f6f5;
+  --color-surface: #ffffff;
+  --color-surface-hover: #edf1ee;
+  --color-surface-elevated: #f9fafb;
+  --color-text-main: #17211b;
+  --color-text-muted: #65736a;
+  --color-text-subtle: #9cad9e;
+  --color-border: #d8e0db;
+  --color-border-subtle: #e8eeed;
+  --color-ink: #111714;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  * {
+    border-color: var(--color-border);
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+  body {
+    background: var(--color-background);
+    color: var(--color-text-main);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: var(--font-display); }
+}
+
+/* ── Compatibility palette ──────────────────────────────────────── */
+@layer utilities {
+  .bg-white, .bg-gray-50, .bg-slate-50  { background-color: var(--color-surface) !important; }
+  .bg-gray-100, .bg-slate-100           { background-color: var(--color-surface-hover) !important; }
+  .bg-gray-950, .bg-black               { background-color: var(--color-ink) !important; }
+  .text-gray-950, .text-gray-900, .text-slate-900 { color: var(--color-text-main) !important; }
+  .text-gray-700, .text-gray-600, .text-slate-700  { color: #c4c5cb !important; }
+  .text-gray-500, .text-gray-400, .text-slate-500  { color: var(--color-text-muted) !important; }
+  .border-gray-100, .border-gray-200, .border-gray-300,
+  .border-slate-200, .border-slate-300  { border-color: var(--color-border) !important; }
+  .hover\:bg-gray-50:hover, .hover\:bg-gray-100:hover,
+  .hover\:bg-gray-800:hover              { background-color: var(--color-surface-hover) !important; }
+  .focus\:border-gray-950:focus, .focus\:border-black:focus,
+  .focus\:border-gray-400:focus          { border-color: var(--color-primary) !important; }
+  .bg-green-600, .bg-green-500, .bg-cyan-800 { background-color: var(--color-primary) !important; }
+  .hover\:bg-green-700:hover, .hover\:bg-cyan-700:hover { background-color: var(--color-primary-hover) !important; }
+  .text-green-700, .text-green-800, .text-green-900 { color: #82e6ad !important; }
+  .bg-green-50   { background-color: rgb(0 192 88 / 0.12) !important; }
+  .border-green-200 { border-color: rgb(0 192 88 / 0.35) !important; }
+
+  /* cyan → map to primary brand green */
+  .text-cyan-700, .text-cyan-800 { color: var(--color-primary) !important; }
+  .hover\:text-cyan-800:hover    { color: var(--color-primary-hover) !important; }
+  .focus\:border-cyan-500:focus  { border-color: var(--color-primary) !important; }
+  .focus\:ring-cyan-100:focus    { --tw-ring-color: rgb(0 192 88 / 0.15) !important; }
+  .bg-cyan-500 { background-color: var(--color-primary) !important; }
+
+  /* Job card semantic classes */
+  .job-card-title { color: var(--color-text-main); }
+  .job-card-copy  { color: var(--color-text-muted); }
+  .job-card-meta  { color: var(--color-text-muted); }
+
+  body[data-theme="light"] .job-card-title { color: #14241a; }
+  body[data-theme="light"] .job-card-copy  { color: #234a32; }
+  body[data-theme="light"] .job-card-meta  { color: #39704b; }
+
+  /* ── Global spinner utility ─────────────────────────────────── */
+  .spinner {
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    animation: spin 0.75s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Glow accent ─────────────────────────────────────────────── */
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(0, 192, 88, 0.18), 0 0 60px rgba(0, 192, 88, 0.06);
+  }
+  .glow-primary-sm {
+    box-shadow: 0 0 10px rgba(0, 192, 88, 0.22);
+  }
+
+  /* ── Glassmorphism ───────────────────────────────────────────── */
+  .glass {
+    background: rgba(26, 26, 34, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ── Status badge helpers ────────────────────────────────────── */
+  .badge-pending  { background: rgb(234 179 8 / 0.15);  color: #facc15; border: 1px solid rgb(234 179 8 / 0.3); }
+  .badge-accepted { background: rgb(0 192 88 / 0.12);   color: #82e6ad; border: 1px solid rgb(0 192 88 / 0.3); }
+  .badge-rejected { background: rgb(239 68 68 / 0.12);  color: #f87171; border: 1px solid rgb(239 68 68 / 0.3); }
+  .badge-open       { background: rgb(0 192 88 / 0.12);   color: #82e6ad; border: 1px solid rgb(0 192 88 / 0.3); }
+  .badge-closed     { background: rgb(239 68 68 / 0.12);  color: #f87171; border: 1px solid rgb(239 68 68 / 0.3); }
+  .badge-in-progress{ background: rgb(139 92 246 / 0.15); color: #c4b5fd; border: 1px solid rgb(139 92 246 / 0.3); }
+  .badge-completed  { background: rgb(59 130 246 / 0.12); color: #93c5fd; border: 1px solid rgb(59 130 246 / 0.3); }
+
+  body[data-theme="light"] .badge-pending   { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+  body[data-theme="light"] .badge-accepted  { background: #dcfce7; color: #166534; border-color: #86efac; }
+  body[data-theme="light"] .badge-rejected  { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+  body[data-theme="light"] .badge-open      { background: #dcfce7; color: #166534; border-color: #86efac; }
+  body[data-theme="light"] .badge-closed    { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+  body[data-theme="light"] .badge-in-progress { background: #ede9fe; color: #5b21b6; border-color: #c4b5fd; }
+  body[data-theme="light"] .badge-completed { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+
+  /* ── Form field base ─────────────────────────────────────────── */
+  .field {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface-hover);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--color-text-main);
+    outline: none;
+    transition: border-color 200ms, box-shadow 200ms, background-color 200ms;
+  }
+  .field:focus {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface);
+    box-shadow: 0 0 0 3px rgb(0 192 88 / 0.12);
+  }
+  .field::placeholder { color: var(--color-text-muted); }
+}

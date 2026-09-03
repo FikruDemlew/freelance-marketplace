@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
@@ -6,13 +6,23 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
+import Landing from "./pages/Landing";
+import MyApplications from "./pages/MyApplications";
+import Messages from "./pages/Messages";
+import MyJobs from "./pages/MyJobs";
+import Notifications from "./pages/Notifications";
+import MyProfile from "./pages/MyProfile";
+import PublicProfile from "./pages/PublicProfile";
+import Dashboard from "./pages/Dashboard";
+import SavedJobs from "./pages/SavedJobs";
+
 function App() {
     return (
         <Routes>
 
             <Route
                 path="/"
-                element={<Navigate to="/jobs" />}
+                element={<Landing />}
             />
 
             <Route
@@ -43,6 +53,9 @@ function App() {
                     </ProtectedRoute>
                 }
             />
+
+
+
             <Route
                 path="/jobs/:id/edit"
                 element={
@@ -51,6 +64,84 @@ function App() {
                     </ProtectedRoute>
                }
             />
+            <Route
+                path="/my-applications"
+                element={
+                    <ProtectedRoute allowedRole="freelancer">
+                        <MyApplications />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/saved-jobs"
+                element={
+                    <ProtectedRoute>
+                        <SavedJobs />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/chat/:conversationId"
+                element={
+                    <ProtectedRoute>
+                        <Messages />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/messages"
+                element={
+                    <ProtectedRoute>
+                        <Messages />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/notifications"
+                element={
+                    <ProtectedRoute>
+                        <Notifications />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/my-jobs"
+                element={
+                    <ProtectedRoute allowedRole="client">
+                        <MyJobs />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute>
+                        <MyProfile />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/profile/:userId"
+                element={<PublicProfile />}
+            />
+
+            <Route
+                path="/dashboard"
+                element={
+                    <ProtectedRoute>
+                        <Dashboard />
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route path="*" element={<Navigate to="/jobs" replace />} />
         </Routes>
     );
 }
